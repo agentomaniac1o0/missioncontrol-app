@@ -1,0 +1,16 @@
+.DS_Store
+*.log
+*.pyc
+__pycache__/
+.venv/
+node_modules/
+.pub-cache/
+build/
+.flatpak-builder/
+repo/
+.env
+*.swp
+*.swo
+.idea/
+.vscode/
+*.iml
