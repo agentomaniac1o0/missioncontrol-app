@@ -50,6 +50,16 @@ class HealthCheckPoller {
 
   Future<void> _check(String location) async {
     try {
+      final issues = await checkOnce(location);
+      if (issues.isNotEmpty) {
+        await showCriticalNotification('Mission Control Alert', issues.join('\n'));
+      }
+    } catch (_) {}
+  }
+
+  Future<List<String>> checkOnce(String location) async {
+    final issues = <String>[];
+    try {
       final liveResp = await _dio.get(ApiConfig.liveUrl(location));
       final healthResp = await _dio.get(ApiConfig.healthUrl(location));
 
@@ -62,14 +72,10 @@ class HealthCheckPoller {
       final offlineServices =
           checks.where((s) => s['online'] == false).map((s) => s['service']).toList();
 
-      final issues = <String>[];
       if (score < 50) issues.add('Health Score: $score');
       if (criticalSystems.isNotEmpty) issues.add('Offline: ${criticalSystems.join(', ')}');
       if (offlineServices.isNotEmpty) issues.add('Services down: ${offlineServices.join(', ')}');
-
-      if (issues.isNotEmpty) {
-        await showCriticalNotification('Mission Control Alert', issues.join('\n'));
-      }
     } catch (_) {}
+    return issues;
   }
 }
