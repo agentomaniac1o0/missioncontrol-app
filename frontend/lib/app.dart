@@ -5,6 +5,7 @@ import 'pages/overview_page.dart';
 import 'pages/system_page.dart';
 import 'pages/code_quality_page.dart';
 import 'providers/missioncontrol_provider.dart';
+import 'widgets/refresh_badge.dart';
 
 class MissionControlApp extends ConsumerWidget {
   const MissionControlApp({super.key});
@@ -21,7 +22,17 @@ class MissionControlApp extends ConsumerWidget {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Mission Control'),
+            title: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Mission Control', style: TextStyle(fontSize: 18)),
+                SizedBox(height: 2),
+                Text(
+                  'Daten: tägl. 03:00 (Monitoring Crew)  •  Live: stündl. Health Checks',
+                  style: TextStyle(fontSize: 10, color: Colors.white30, fontWeight: FontWeight.normal),
+                ),
+              ],
+            ),
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'Ubersicht'),

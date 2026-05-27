@@ -7,6 +7,7 @@ import '../providers/missioncontrol_provider.dart';
 import '../widgets/disk_bar.dart';
 import '../widgets/health_dot.dart';
 import '../widgets/health_score_card.dart';
+import '../widgets/refresh_badge.dart';
 import '../widgets/service_matrix.dart';
 import '../widgets/vm_card.dart';
 
@@ -32,13 +33,16 @@ class OverviewPage extends ConsumerWidget {
           _buildHealthScore(healthAsync),
           const SizedBox(height: 12),
           _buildStatusStrip(overviewAsync),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          SectionHeader(title: 'Disk Usage', frequency: RefreshFrequency.daily, subtitle: 'aus Report'),
           _buildDiskOverview(overviewAsync),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily, subtitle: 'aus Report'),
           _buildVmGrid(systemAsync),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          SectionHeader(title: 'Services', frequency: RefreshFrequency.daily, subtitle: 'aus Report'),
           _buildServiceMatrix(systemAsync),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           _buildAlerts(overviewAsync),
         ],
       ),
@@ -85,9 +89,6 @@ class OverviewPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Disk Usage',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
                 ...overview.diskUsage.entries.map(
                   (e) => DiskBar(label: e.key, percent: e.value),
                 ),
@@ -105,27 +106,17 @@ class OverviewPage extends ConsumerWidget {
     return async.when(
       data: (system) {
         if (system.vms.isEmpty) return const SizedBox.shrink();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 4, bottom: 8),
-              child: Text('VMs & LXCs',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-            ),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1.6,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: system.vms.length,
-              itemBuilder: (_, i) => VmCard(vm: system.vms[i]),
-            ),
-          ],
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1.6,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: system.vms.length,
+          itemBuilder: (_, i) => VmCard(vm: system.vms[i]),
         );
       },
       loading: () => const SizedBox.shrink(),
@@ -154,9 +145,11 @@ class OverviewPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Aktive Alerts',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.orangeAccent)),
-                const SizedBox(height: 8),
+                SectionHeader(
+                  title: 'Aktive Alerts',
+                  frequency: RefreshFrequency.daily,
+                  subtitle: 'aus Report',
+                ),
                 ...overview.activeAlerts.map((a) => Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Text(a, style: const TextStyle(fontSize: 12)),

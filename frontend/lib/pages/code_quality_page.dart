@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../providers/missioncontrol_provider.dart';
 import '../widgets/finding_card.dart';
+import '../widgets/refresh_badge.dart';
 
 class CodeQualityPage extends ConsumerWidget {
   const CodeQualityPage({super.key});
@@ -20,12 +21,13 @@ class CodeQualityPage extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          SectionHeader(title: 'Sicherheits-Statistik', frequency: RefreshFrequency.daily),
           _buildSummaryCards(codeQualityAsync),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           _buildFindings(codeQualityAsync),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           _buildOpenPorts(codeQualityAsync),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           _buildAutoFixes(codeQualityAsync),
         ],
       ),
@@ -90,10 +92,10 @@ class CodeQualityPage extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 4, bottom: 8),
-              child: Text('Audit Findings',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            SectionHeader(
+              title: 'Audit Findings',
+              frequency: RefreshFrequency.daily,
+              subtitle: '${cq.findings.length} total',
             ),
             ...cq.findings.map((f) => FindingCard(finding: f)),
           ],
@@ -114,9 +116,7 @@ class CodeQualityPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Offene Ports',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
+                SectionHeader(title: 'Offene Ports', frequency: RefreshFrequency.daily),
                 ...cq.openPorts.map((p) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
                       child: Row(
@@ -166,7 +166,6 @@ class CodeQualityPage extends ConsumerWidget {
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   ],
                 ),
-                const SizedBox(height: 8),
                 ...cq.autoFixResults.map((r) => Padding(
                       padding: const EdgeInsets.only(bottom: 3),
                       child: Text(r, style: const TextStyle(fontSize: 11, color: Colors.white54)),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../providers/missioncontrol_provider.dart';
 import '../widgets/health_dot.dart';
+import '../widgets/refresh_badge.dart';
 import '../widgets/vm_card.dart';
 
 class SystemPage extends ConsumerWidget {
@@ -42,8 +43,7 @@ class SystemPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Proxmox Host',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                SectionHeader(title: 'Proxmox Host', frequency: RefreshFrequency.daily),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -121,11 +121,8 @@ class SystemPage extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 4, bottom: 8),
-              child: Text('VMs & LXCs',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-            ),
+            SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily),
+            const SizedBox(height: 8),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -156,8 +153,7 @@ class SystemPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Services', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
+                SectionHeader(title: 'Services', frequency: RefreshFrequency.daily),
                 ...system.services.map((s) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
                       child: Row(
@@ -192,8 +188,7 @@ class SystemPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Backups', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
+                SectionHeader(title: 'Backups', frequency: RefreshFrequency.daily),
                 ...system.backups.map((b) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
                       child: Row(
