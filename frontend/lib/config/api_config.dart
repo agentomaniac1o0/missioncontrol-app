@@ -1,5 +1,10 @@
+const String apiBaseUrl = String.fromEnvironment(
+  'API_BASE_URL',
+  defaultValue: 'http://100.103.32.107:8000',
+);
+
 class ApiConfig {
-  static const String baseUrl = 'http://localhost:8000';
+  static const String baseUrl = apiBaseUrl;
   static const String missioncontrolPath = '/api/missioncontrol';
 
   static String overviewUrl(String location) =>
