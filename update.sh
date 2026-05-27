@@ -37,6 +37,10 @@ do_frontend() {
     echo "→ flutter build linux..."
     flutter build linux --release --dart-define="API_BASE_URL=$API_URL"
 
+    echo "→ copy desktop integration..."
+    cp "$MISSION_DIR/deploy/app.missioncontrol.MissionControlApp.desktop" "$MISSION_DIR/frontend/build/linux/x64/release/bundle/"
+    cp "$MISSION_DIR/deploy/icon.png" "$MISSION_DIR/frontend/build/linux/x64/release/bundle/"
+
     cd ../deploy
     rm -rf .flatpak-builder
     echo "→ flatpak install..."

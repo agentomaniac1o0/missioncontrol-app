@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Mission Control
+Comment=Home Lab & Production Center Dashboard
+Exec=missioncontrol_app
+Icon=app.missioncontrol.MissionControlApp
+Terminal=false
+Type=Application
+Categories=System;Monitor;
+StartupWMClass=missioncontrol_app
