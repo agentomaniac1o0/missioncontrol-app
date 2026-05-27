@@ -17,6 +17,10 @@ class ApiConfig {
       '$baseUrl$missioncontrolPath/$location/live';
   static String healthUrl(String location) =>
       '$baseUrl$missioncontrolPath/$location/health';
+  static String healthTrendUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/health-trend';
+  static String criticalCountUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/live/critical-count';
 
   static String graphiphyStatsUrl(String location) =>
       '$baseUrl$missioncontrolPath/$location/graphiphy/stats';

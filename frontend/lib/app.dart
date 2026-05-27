@@ -86,6 +86,8 @@ class MissionControlApp extends ConsumerWidget {
                   ref.invalidate(graphiphyStatsProvider(loc));
                   ref.invalidate(graphiphyGodNodesProvider(loc));
                   ref.invalidate(graphiphyCommunitiesProvider(loc));
+                  ref.invalidate(criticalCountProvider(loc));
+                  ref.invalidate(healthTrendProvider(loc));
                 },
               ),
               _LocationToggle(location: location),

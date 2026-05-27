@@ -21,14 +21,14 @@ final missioncontrollerHealthProvider =
 final criticalCountProvider =
     FutureProvider.family<LiveCriticalCount, String>((ref, location) async {
   final dio = ref.watch(dioProvider);
-  final response = await dio.get('${ApiConfig.liveUrl(location)}/critical-count');
+  final response = await dio.get(ApiConfig.criticalCountUrl(location));
   return LiveCriticalCount.fromJson(response.data as Map<String, dynamic>);
 });
 
 final healthTrendProvider =
     FutureProvider.family<List<HealthTrendPoint>, String>((ref, location) async {
   final dio = ref.watch(dioProvider);
-  final response = await dio.get('${ApiConfig.healthUrl(location).replaceAll("/health", "/health-trend")}');
+  final response = await dio.get(ApiConfig.healthTrendUrl(location));
   final list = response.data as List<dynamic>;
   return list.map((e) => HealthTrendPoint.fromJson(e as Map<String, dynamic>)).toList();
 });
