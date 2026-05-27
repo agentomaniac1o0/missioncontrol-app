@@ -30,4 +30,6 @@ class ApiConfig {
       '$baseUrl$missioncontrolPath/$location/graphiphy/search';
   static String graphiphyVizUrl(String location) =>
       '$baseUrl$missioncontrolPath/$location/graphiphy/viz';
+  static String graphiphySvgUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/graphiphy/svg';
 }

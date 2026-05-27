@@ -68,3 +68,7 @@ final graphiphySearchProvider =
 final graphiphyVizUrlProvider = Provider.family<String, String>((ref, location) {
   return ApiConfig.graphiphyVizUrl(location);
 });
+
+final graphiphySvgUrlProvider = Provider.family<String, String>((ref, location) {
+  return ApiConfig.graphiphySvgUrl(location);
+});

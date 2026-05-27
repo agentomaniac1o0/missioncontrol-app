@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config/theme.dart';
 import '../providers/graphiphy_provider.dart';
@@ -86,49 +87,44 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
   }
 
   Widget _buildGraphTab(String location) {
+    final svgUrl = ref.watch(graphiphySvgUrlProvider(location));
     final vizUrl = ref.watch(graphiphyVizUrlProvider(location));
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.hub, size: 64, color: AppTheme.violet.withValues(alpha: 0.4)),
-            const SizedBox(height: 16),
-            const Text(
-              'Interaktiver Knowledge Graph',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+
+    return Stack(
+      children: [
+        InteractiveViewer(
+          minScale: 0.1,
+          maxScale: 5.0,
+          child: Center(
+            child: SvgPicture.network(
+              svgUrl,
+              width: 2000,
+              placeholderBuilder: (_) =>
+                  const Center(child: CircularProgressIndicator()),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Der graph.html wird im Browser geoeffnet.\nZoomen, ziehen, klicken – volle D3.js-Interaktivitaet.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.white38),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: () => _openInBrowser(vizUrl),
-              icon: const Icon(Icons.open_in_browser, size: 18),
-              label: const Text('Graph im Browser oeffnen'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.violet,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextButton.icon(
-              onPressed: () {
-                ref.invalidate(graphiphyVizUrlProvider(location));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Graph-URL neu geladen')),
-                );
-              },
-              icon: const Icon(Icons.refresh, size: 14),
-              label: const Text('URL neu laden', style: TextStyle(fontSize: 11)),
-            ),
-          ],
+          ),
         ),
-      ),
+        Positioned(
+          right: 12,
+          bottom: 12,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FloatingActionButton.small(
+                heroTag: 'browser',
+                onPressed: () => _openInBrowser(vizUrl),
+                backgroundColor: AppTheme.violet,
+                child: const Icon(Icons.open_in_browser, size: 18),
+              ),
+              const SizedBox(height: 4),
+              Text('Browser',
+                  style: TextStyle(
+                      fontSize: 9,
+                      color: AppTheme.violet.withValues(alpha: 0.7))),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
