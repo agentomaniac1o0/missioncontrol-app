@@ -218,7 +218,77 @@ missioncontrol-app/
 - [ ] Flutter: Code-Quality-Tab
 - [ ] Flutter: Live-Health-Indikatoren
 - [ ] Flutter: Push-Benachrichtigungen (Polling + workmanager)
-- [ ] Deployment: APK + Flatpak
+- [x] Deployment: APK + Flatpak
+- [x] Update-Script: ./update.sh (Frontend) / --backend / --all
+
+## Deployment & Updates
+
+### Linux Desktop (CachyOS) – One-Command Update
+
+```bash
+cd ~/missioncontrol-app && ./update.sh
+```
+
+Das macht: `git pull` → `flutter build linux` → `flatpak-builder install`
+
+**Optionen:**
+| Befehl | Was passiert |
+|--------|-------------|
+| `./update.sh` | Nur Frontend (default) |
+| `./update.sh --backend` | Nur Backend (SSH zu ai-agents, git pull + restart) |
+| `./update.sh --all` | Backend + Frontend |
+
+**Voraussetzungen:** `git clone https://github.com/agentomaniac1o0/missioncontrol-app.git` (einmalig)
+
+### Android APK
+
+APK liegt in Nextcloud: `Home Lab/Mission Control/missioncontrol-*.apk`
+
+### Backend (Server: ai-agents VM 101)
+
+Das Backend läuft in `~/trading-app/backend/`. Update via:
+
+```bash
+ssh ai-agents
+cd ~/trading-app && git pull && systemctl --user restart trading-backend
+```
+
+## Session-Log: 2026-05-27
+
+### Initial Setup & Rename
+- monitoring-app → missioncontrol-app (komplettes Rebranding)
+- Altes Streamlit Mission Control archiviert → `~/mission-control_old/`
+- Grill-Me: 13 Architektur-Entscheidungen
+- Neues GitHub-Repo: `agentomaniac1o0/missioncontrol-app`
+- Altes Repo `agentomaniac1o0/monitoring-app` archiviert
+
+### Flutter App
+- Scaffold mit Riverpod + Dio + fl_chart + flutter_local_notifications + workmanager
+- 3 Tabs: Übersicht (Health Score) · System · Code Quality
+- Globaler Toggle Home Lab ↔ Production Center
+- Dark Theme mit CI-Farben (#00b09b, #e74c3c, #f0a500, #3498db)
+- Refresh-Badges: Täglich (gold), Stündlich (blau), Live (grün)
+- Linux Release + Flatpak + Android APK Build
+
+### Backend (trading-app)
+- Router `/api/missioncontrol/` mit 5 Endpoints
+- Markdown-Parser: VM/LXC/Service/Backup-Daten aus Crew-Report extrahiert
+- Health Score (0-100) mit Sub-Scores (VMs, Services, Audit)
+- Production-Center Platzhalter-Endpoints
+- Pydantic-Settings: `extra='ignore'` für .env-Kompatibilität
+
+### Monitoring Crew (agent-templates)
+- `_build_missioncontrol_json()`: Strukturiertes JSON parallel zu Markdown
+- JSON + MD beide nach Nextcloud hochgeladen
+- LXC 104 (Trading App) in Report + Backup-Prompt aufgenommen
+- JSON-Schema dokumentiert: `schema.json`
+
+### Builds
+| Platform | Status | Pfad |
+|----------|--------|------|
+| Linux (Flatpak) | ✅ | `flatpak run app.missioncontrol.MissionControlApp` |
+| Android (APK) | ✅ | Nextcloud `Home Lab/Mission Control/` |
+| Linux (Bundle) | ✅ | `frontend/build/linux/x64/release/bundle/` |
 
 ## Was NICHT hier rein gehört
 
