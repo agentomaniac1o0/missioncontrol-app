@@ -17,4 +17,17 @@ class ApiConfig {
       '$baseUrl$missioncontrolPath/$location/live';
   static String healthUrl(String location) =>
       '$baseUrl$missioncontrolPath/$location/health';
+
+  static String graphiphyStatsUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/graphiphy/stats';
+  static String graphiphyGodNodesUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/graphiphy/god-nodes';
+  static String graphiphyCommunitiesUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/graphiphy/communities';
+  static String graphiphyCommunityUrl(String location, int communityId) =>
+      '$baseUrl$missioncontrolPath/$location/graphiphy/community/$communityId';
+  static String graphiphySearchUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/graphiphy/search';
+  static String graphiphyVizUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/graphiphy/viz';
 }

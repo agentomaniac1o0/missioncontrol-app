@@ -4,9 +4,11 @@ import 'config/theme.dart';
 import 'pages/overview_page.dart';
 import 'pages/system_page.dart';
 import 'pages/code_quality_page.dart';
+import 'pages/graphiphy_page.dart';
+import 'pages/live_page.dart';
 import 'providers/missioncontrol_provider.dart';
 import 'providers/live_provider.dart';
-import 'widgets/refresh_badge.dart';
+import 'providers/graphiphy_provider.dart';
 
 class MissionControlApp extends ConsumerWidget {
   const MissionControlApp({super.key});
@@ -20,7 +22,7 @@ class MissionControlApp extends ConsumerWidget {
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
-        length: 3,
+        length: 5,
         child: Scaffold(
           appBar: AppBar(
             title: const Column(
@@ -39,7 +41,10 @@ class MissionControlApp extends ConsumerWidget {
                 Tab(text: 'Ubersicht'),
                 Tab(text: 'System'),
                 Tab(text: 'Code Quality'),
+                Tab(text: 'Graphiphy'),
+                Tab(text: 'Live'),
               ],
+              isScrollable: true,
             ),
             actions: [
               IconButton(
@@ -51,6 +56,10 @@ class MissionControlApp extends ConsumerWidget {
                   ref.invalidate(missioncontrollerSystemProvider(loc));
                   ref.invalidate(missioncontrollerCodeQualityProvider(loc));
                   ref.invalidate(missioncontrollerHealthProvider(loc));
+                  ref.invalidate(missioncontrollerLiveProvider(loc));
+                  ref.invalidate(graphiphyStatsProvider(loc));
+                  ref.invalidate(graphiphyGodNodesProvider(loc));
+                  ref.invalidate(graphiphyCommunitiesProvider(loc));
                 },
               ),
               _LocationToggle(location: location),
@@ -62,6 +71,8 @@ class MissionControlApp extends ConsumerWidget {
               OverviewPage(),
               SystemPage(),
               CodeQualityPage(),
+              GraphiphyPage(),
+              LivePage(),
             ],
           ),
         ),

@@ -15,7 +15,7 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 │  Flutter Frontend (Linux Desktop + Android)           │
 │  missioncontrol-app/                                   │
 │  Globaler Toggle: Home Lab ↔ Production Center        │
-│  Tabs: Übersicht · System · Code Quality              │
+│  Tabs: Übersicht · System · Code Quality · Graphiphy · Live │
 │  Health Score + grafische Darstellung aller Komp.     │
 │  Push-Benachrichtigungen bei Critical-Issues          │
 └────────────────────────┬────────────────────────────┘
@@ -50,7 +50,7 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 | 5 | JSON-Generierung | Crew schreibt JSON + Markdown |
 | 6 | App-Integration | Separate Flutter-App (`missioncontrol-app`) |
 | 7 | Standort-Toggle | Globaler Switch in AppBar + gleiche Tabs für beide |
-| 8 | Tabs | Übersicht, System, Code Quality (Mission-Core) |
+| 8 | Tabs | Übersicht, System, Code Quality, Graphiphy, Live |
 | 9 | Backend-Endpoints | Sammel-Endpoint pro Tab: `/api/missioncontrol/{location}/{tab}` |
 | 10 | Live-Daten | Backend macht eigene Service-Health-Checks |
 | 11 | RPi-Aufteilung | RPi nur externe Pings, Backend alle internen Services |
@@ -70,6 +70,13 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 | `GET /api/missioncontrol/{location}/code-quality` | Security-Audit, Code-Review-Findings | Audit-JSON |
 | `GET /api/missioncontrol/{location}/live` | Health-Checks, Heartbeat, RPi-Pings | Background-Task + RPi |
 | `GET /api/missioncontrol/{location}/health` | Health Score (0–100), aggregiert aus VM/Service/Audit-Status | Background-Task |
+| `GET /api/missioncontrol/{location}/graphiphy/stats` | Node/Edge/Community-Counts, File-Types | graph.json |
+| `GET /api/missioncontrol/{location}/graphiphy/god-nodes?top_n=` | Meist-verbundene Nodes nach Degree | graph.json |
+| `GET /api/missioncontrol/{location}/graphiphy/communities?limit=&offset=` | Community-Liste nach Groesse | graph.json |
+| `GET /api/missioncontrol/{location}/graphiphy/community/{id}` | Nodes einer Community | graph.json |
+| `GET /api/missioncontrol/{location}/graphiphy/search?q=` | Node-Suche | graph.json |
+| `GET /api/missioncontrol/{location}/graphiphy/viz` | graph.html (interaktiver D3.js-Graph) | graphify-out/graph.html |
+| `POST /api/missioncontrol/{location}/graphiphy/viz/refresh` | graph.html regenerieren via graphify | graphify CLI |
 
 `{location}` = `home-lab` | `production-center`
 
@@ -106,6 +113,21 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 - Offene Ports, harte Secrets, bare excepts
 - Auto-Fix-Ergebnisse (was wurde automatisch behoben)
 
+### Tab 4 – Graphiphy
+- **Stats**: Node/Edge/Community-Counts, File-Type-Verteilung
+- **God Nodes**: Top-10 meist-verbundene Knoten mit Degree-Anzeige
+- **Communities**: Nach Groesse sortiert, antippbar mit Bottom-Sheet-Detail
+- **Suche**: Freitext-Suche nach Node-Labels
+- **Graph-Visualisierung**: graph.html per "Open in Browser"-Button (D3.js, interaktiv)
+- Datenquelle: `~/graphify-out/graph.json` → Backend
+
+### Tab 5 – Live
+- **Heartbeat Grid**: Pings der Systeme (RPi-Watchdog) mit Puls-Animation
+- **Service Status**: Port-Checks mit Response-Time-Balken, farbcodiert
+- **Response-Time Chart**: fl_chart BarChart der Service-Antwortzeiten
+- **Auto-Refresh**: Alle 30 Sekunden (Timer + Provider-Invalidation)
+- Datenquelle: `/api/missioncontrol/{location}/live`
+
 ## Datenquellen & Ablage
 
 ### Statische Daten (täglich, aus Reports)
@@ -127,6 +149,14 @@ RPi Watchdog → externe Ping-Daten per SSH-Pull
 - Crew schreibt Reports automatisch per WebDAV nach Nextcloud
 - Dient als Fallback/Nachschlag, falls die App nicht verfügbar ist
 - Kein Upload-Code in der App nötig
+
+### Graphify (Knowledge Graph)
+- `graph.json` liegt in `~/graphify-out/` (509k Nodes, 654k Edges, 33k Communities)
+- Backend liest `graph.json` direkt, cached im RAM, erkennt mtime-Änderungen
+- `graph.html` zeigt Top-500 Communities als aggregierten Meta-Graph (D3.js)
+- Nach Code-Änderungen: `graphify update . && graphify cluster-only .` → HTML + JSON aktualisiert
+- Für grosse Graphen (>5000 Nodes): `GRAPHIFY_VIZ_NODE_LIMIT` env var setzen
+- App öffnet graph.html via System-Browser (`url_launcher`)
 
 ## Push-Benachrichtigungen
 
@@ -180,14 +210,18 @@ missioncontrol-app/
 │       │   ├── missioncontrol_system.dart
 │       │   ├── missioncontrol_code_quality.dart
 │       │   ├── missioncontrol_live.dart
-│       │   └── missioncontrol_health.dart
+│       │   ├── missioncontrol_health.dart
+│       │   └── missioncontrol_graphiphy.dart
 │       ├── providers/
 │       │   ├── missioncontrol_provider.dart
-│       │   └── live_provider.dart
+│       │   ├── live_provider.dart
+│       │   └── graphiphy_provider.dart
 │       ├── pages/
 │       │   ├── overview_page.dart
 │       │   ├── system_page.dart
-│       │   └── code_quality_page.dart
+│       │   ├── code_quality_page.dart
+│       │   ├── graphiphy_page.dart
+│       │   └── live_page.dart
 │       └── widgets/
 │           ├── health_score_card.dart
 │           ├── health_dot.dart
@@ -254,6 +288,15 @@ cd ~/trading-app && git pull && systemctl --user restart trading-backend
 ```
 
 ## Session-Log: 2026-05-27
+
+### Graphiphy + Live Tabs
+- 2 neue Tabs: Graphiphy (Tab 4) + Live (Tab 5)
+- **Graphiphy**: Stats, God Nodes, Communities, Suche, graph.html-Visualisierung per Browser
+- **Live**: Heartbeat-Grid (Puls-Animation), Service-Checks mit Response-Times, fl_chart BarChart, 30s Auto-Refresh
+- Neue Backend-Endpoints: `/graphiphy/stats`, `/god-nodes`, `/communities`, `/community/{id}`, `/search`, `/viz`, `/viz/refresh`
+- `graph.html` generiert (Top-500 Communities, 442KB, aggregierte D3.js-Visualisierung)
+- `url_launcher` statt `flutter_inappwebview` (kein Linux-Plugin)
+- Code: `schemas.py` (+4 Klassen), `missioncontrol.py` (+200 Zeilen), Flutter: 5 neue Dateien
 
 ### Initial Setup & Rename
 - monitoring-app → missioncontrol-app (komplettes Rebranding)
