@@ -11,6 +11,11 @@ class VmDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasInfo = update != null;
+    final hasFixes = hasInfo && update!.autoFixes.isNotEmpty;
+    final hasWarnings = hasInfo && update!.warnings.isNotEmpty;
+    final needsReboot = hasInfo && update!.rebootNeeded;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -22,20 +27,16 @@ class VmDetailCard extends StatelessWidget {
                 HealthDot(status: vm.status, size: 8),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    vm.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                  ),
+                  child: Text(vm.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 ),
-                if (update != null && update!.rebootNeeded)
-                  _tag('Reboot nötig', AppTheme.red),
+                if (needsReboot) _tag('Reboot nötig', AppTheme.red),
               ],
             ),
             const SizedBox(height: 10),
             _metricBar('CPU', vm.cpuPercent, AppTheme.blue),
             _metricBar('RAM', vm.ramPercent, AppTheme.gold),
             _metricBar('Disk', vm.diskPercent, AppTheme.green),
-            if (update != null) ...[
+            if (hasInfo) ...[
               if (update!.kernel.isNotEmpty) ...[
                 const SizedBox(height: 6),
                 Row(
@@ -43,58 +44,50 @@ class VmDetailCard extends StatelessWidget {
                     const Icon(Icons.memory, size: 12, color: Colors.white38),
                     const SizedBox(width: 4),
                     Expanded(
-                      child: Text(
-                        update!.kernel,
-                        style: const TextStyle(fontSize: 10, color: Colors.white54, fontFamily: 'monospace'),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      child: Text(update!.kernel, style: const TextStyle(fontSize: 10, color: Colors.white54, fontFamily: 'monospace'), overflow: TextOverflow.ellipsis),
                     ),
                   ],
                 ),
               ],
-              if (update!.autoFixes.isNotEmpty) ...[
-                const SizedBox(height: 4),
+              if (hasWarnings || needsReboot) ...[
+                const SizedBox(height: 6),
                 const Divider(height: 1, color: Colors.white12),
                 const SizedBox(height: 4),
-                ...update!.autoFixes.take(3).map((f) => Padding(
+                const Text('⚠ Ausstehend', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.gold)),
+                const SizedBox(height: 2),
+                ...update!.warnings.take(3).map((w) => Padding(
                       padding: const EdgeInsets.only(bottom: 2),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.check_circle_outline, size: 11, color: AppTheme.green),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(f, style: const TextStyle(fontSize: 10, color: Colors.white54)),
-                          ),
+                          const Text('  • ', style: TextStyle(fontSize: 10, color: AppTheme.gold)),
+                          Expanded(child: Text(w, style: const TextStyle(fontSize: 10, color: Colors.white54))),
                         ],
                       ),
                     )),
-                if (update!.autoFixes.length > 3)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Text(
-                      '+ ${update!.autoFixes.length - 3} weitere',
-                      style: const TextStyle(fontSize: 9, color: Colors.white30),
-                    ),
-                  ),
               ],
-              if (update!.warnings.isNotEmpty) ...[
+              if (hasFixes) ...[
                 const SizedBox(height: 4),
                 const Divider(height: 1, color: Colors.white12),
                 const SizedBox(height: 4),
-                ...update!.warnings.take(2).map((w) => Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
+                const Text('✓ Erledigt', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.green)),
+                const SizedBox(height: 2),
+                ...update!.autoFixes.take(4).map((f) => Padding(
+                      padding: const EdgeInsets.only(bottom: 1),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.warning_amber, size: 11, color: AppTheme.gold),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(w, style: const TextStyle(fontSize: 10, color: Colors.white54)),
-                          ),
+                          const Text('  • ', style: TextStyle(fontSize: 10, color: AppTheme.green)),
+                          Expanded(child: Text(f, style: const TextStyle(fontSize: 10, color: Colors.white38))),
                         ],
                       ),
                     )),
+                if (update!.autoFixes.length > 4)
+                  Text('  + ${update!.autoFixes.length - 4} weitere', style: const TextStyle(fontSize: 9, color: Colors.white24)),
+              ],
+              if (!hasFixes && !hasWarnings && !needsReboot && update!.kernel.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                const Text('Keine offenen Themen', style: TextStyle(fontSize: 10, color: Colors.white24, fontStyle: FontStyle.italic)),
               ],
             ],
           ],
@@ -138,10 +131,7 @@ class VmDetailCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       margin: const EdgeInsets.only(left: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
       child: Text(text, style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.w600)),
     );
   }
