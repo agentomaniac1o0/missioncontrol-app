@@ -47,9 +47,19 @@ do_frontend() {
     flatpak-builder --repo=repo --force-clean --install --user build-dir \
         app.missioncontrol.MissionControlApp.yml
 
-    echo "→ link desktop entry..."
+    echo "→ desktop entry..."
     mkdir -p $HOME/.local/share/applications
-    ln -sf $HOME/.local/share/flatpak/exports/share/applications/app.missioncontrol.MissionControlApp.desktop $HOME/.local/share/applications/
+    cat > $HOME/.local/share/applications/missioncontrol.desktop << 'DESKTOP'
+[Desktop Entry]
+Name=Mission Control
+Comment=Home Lab & Production Center Dashboard
+Exec=flatpak run app.missioncontrol.MissionControlApp
+Icon=app.missioncontrol.MissionControlApp
+Terminal=false
+Type=Application
+Categories=System;Monitor;
+StartupWMClass=missioncontrol_app
+DESKTOP
 
     echo ""
     echo -e "${GREEN}✓ App bereit:${RESET} flatpak run app.missioncontrol.MissionControlApp"
