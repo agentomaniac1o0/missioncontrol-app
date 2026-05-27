@@ -7,13 +7,15 @@ import '../config/theme.dart';
 final _notifications = FlutterLocalNotificationsPlugin();
 
 Future<void> initNotifications() async {
-  const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const linuxSettings = LinuxInitializationSettings(defaultActionName: 'Open');
-  const initSettings = InitializationSettings(
-    android: androidSettings,
-    linux: linuxSettings,
-  );
-  await _notifications.initialize(initSettings);
+  try {
+    const androidSettings = AndroidInitializationSettings('@android:drawable/ic_dialog_info');
+    const linuxSettings = LinuxInitializationSettings(defaultActionName: 'Open');
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      linux: linuxSettings,
+    );
+    await _notifications.initialize(initSettings);
+  } catch (_) {}
 }
 
 Future<void> showCriticalNotification(String title, String body) async {

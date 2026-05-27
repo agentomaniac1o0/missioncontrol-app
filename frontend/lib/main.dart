@@ -23,22 +23,26 @@ void callbackDispatcher() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initNotifications();
+  try {
+    await initNotifications();
+  } catch (_) {}
 
-  if (Platform.isAndroid) {
-    await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-    await Workmanager().registerPeriodicTask(
-      _taskName,
-      _taskName,
-      frequency: const Duration(minutes: 15),
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-      ),
-    );
-  } else {
-    final poller = HealthCheckPoller(Dio());
-    poller.start('home-lab');
-  }
+  try {
+    if (Platform.isAndroid) {
+      await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+      await Workmanager().registerPeriodicTask(
+        _taskName,
+        _taskName,
+        frequency: const Duration(minutes: 15),
+        constraints: Constraints(
+          networkType: NetworkType.connected,
+        ),
+      );
+    } else {
+      final poller = HealthCheckPoller(Dio());
+      poller.start('home-lab');
+    }
+  } catch (_) {}
 
   runApp(
     const ProviderScope(
