@@ -122,15 +122,15 @@ class SystemPage extends ConsumerWidget {
             SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily),
             const SizedBox(height: 8),
             ...system.vms.map((vm) {
-              final vmNum = RegExp(r'\d+').firstMatch(vm.name.split(':')[0])?.group(0);
-              final upd = system.updates.cast<SysUpdate?>().firstWhere(
-                    (u) {
-                      if (u == null) return false;
-                      final upNum = RegExp(r'\d+').firstMatch(u.system)?.group(0);
-                      return vmNum != null && upNum != null && vmNum == upNum;
-                    },
-                    orElse: () => null,
-                  );
+              final vmNum = RegExp(r'\d+').firstMatch(vm.name)?.group(0);
+              SysUpdate? upd;
+              for (final u in system.updates) {
+                final upNum = RegExp(r'\d+').firstMatch(u.system)?.group(0);
+                if (vmNum != null && upNum != null && vmNum == upNum) {
+                  upd = u;
+                  break;
+                }
+              }
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: VmDetailCard(vm: vm, update: upd),
