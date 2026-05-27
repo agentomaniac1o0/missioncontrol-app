@@ -95,13 +95,12 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
         InteractiveViewer(
           minScale: 0.1,
           maxScale: 5.0,
-          child: Center(
-            child: SvgPicture.network(
-              svgUrl,
-              width: 2000,
-              placeholderBuilder: (_) =>
-                  const Center(child: CircularProgressIndicator()),
-            ),
+          constrained: false,
+          child: SvgPicture.network(
+            svgUrl,
+            fit: BoxFit.contain,
+            placeholderBuilder: (_) =>
+                const Center(child: CircularProgressIndicator()),
           ),
         ),
         Positioned(
