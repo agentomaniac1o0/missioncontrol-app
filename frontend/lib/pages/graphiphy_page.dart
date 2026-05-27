@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config/theme.dart';
 import '../providers/graphiphy_provider.dart';
@@ -87,7 +86,7 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
   }
 
   Widget _buildGraphTab(String location) {
-    final svgUrl = ref.watch(graphiphySvgUrlProvider(location));
+    final pngUrl = ref.watch(graphiphyPngUrlProvider(location));
     final vizUrl = ref.watch(graphiphyVizUrlProvider(location));
 
     return Stack(
@@ -96,11 +95,24 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
           minScale: 0.1,
           maxScale: 5.0,
           constrained: false,
-          child: SvgPicture.network(
-            svgUrl,
+          child: Image.network(
+            pngUrl,
             fit: BoxFit.contain,
-            placeholderBuilder: (_) =>
-                const Center(child: CircularProgressIndicator()),
+            loadingBuilder: (_, child, progress) {
+              if (progress == null) return child;
+              return const Center(child: CircularProgressIndicator());
+            },
+            errorBuilder: (_, e, __) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.broken_image, size: 48, color: Colors.white24),
+                  const SizedBox(height: 8),
+                  Text('Graph nicht ladbar',
+                      style: TextStyle(color: AppTheme.red.withValues(alpha: 0.7))),
+                ],
+              ),
+            ),
           ),
         ),
         Positioned(
