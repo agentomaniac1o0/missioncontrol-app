@@ -6,6 +6,7 @@ import 'pages/system_page.dart';
 import 'pages/code_quality_page.dart';
 import 'pages/graphiphy_page.dart';
 import 'pages/live_page.dart';
+import 'pages/reports_page.dart';
 import 'providers/missioncontrol_provider.dart';
 import 'providers/live_provider.dart';
 import 'providers/graphiphy_provider.dart';
@@ -22,7 +23,7 @@ class MissionControlApp extends ConsumerWidget {
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
-        length: 5,
+        length: 6,
         child: Scaffold(
           appBar: AppBar(
             title: const Column(
@@ -43,6 +44,7 @@ class MissionControlApp extends ConsumerWidget {
                 Tab(text: 'Code Quality'),
                 Tab(text: 'Graphiphy'),
                 Tab(text: 'Live'),
+                Tab(text: 'Berichte'),
               ],
               isScrollable: true,
             ),
@@ -73,6 +75,7 @@ class MissionControlApp extends ConsumerWidget {
               CodeQualityPage(),
               GraphiphyPage(),
               LivePage(),
+              ReportsPage(),
             ],
           ),
         ),

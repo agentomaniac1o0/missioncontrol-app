@@ -34,4 +34,9 @@ class ApiConfig {
       '$baseUrl$missioncontrolPath/$location/graphiphy/svg';
   static String graphiphyPngUrl(String location) =>
       '$baseUrl$missioncontrolPath/$location/graphiphy/png';
+
+  static String reportsUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/reports';
+  static String reportDetailUrl(String location, String filename) =>
+      '$baseUrl$missioncontrolPath/$location/reports/$filename';
 }
