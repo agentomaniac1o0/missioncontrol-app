@@ -5,7 +5,7 @@ import '../models/missioncontrol_system.dart';
 import '../providers/missioncontrol_provider.dart';
 import '../widgets/health_dot.dart';
 import '../widgets/refresh_badge.dart';
-import '../widgets/vm_gauge_card.dart';
+import '../widgets/vm_ring_card.dart';
 
 class SystemPage extends ConsumerWidget {
   const SystemPage({super.key});
@@ -131,7 +131,7 @@ class SystemPage extends ConsumerWidget {
                 mainAxisSpacing: 8,
               ),
               itemCount: system.vms.length,
-              itemBuilder: (_, i) => VmGaugeCard(vm: system.vms[i]),
+              itemBuilder: (_, i) => VmRingCard(vm: system.vms[i]),
             ),
           ],
         );

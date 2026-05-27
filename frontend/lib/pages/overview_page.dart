@@ -9,7 +9,7 @@ import '../widgets/health_dot.dart';
 import '../widgets/health_score_card.dart';
 import '../widgets/refresh_badge.dart';
 import '../widgets/service_matrix.dart';
-import '../widgets/vm_gauge_card.dart';
+import '../widgets/vm_ring_card.dart';
 
 class OverviewPage extends ConsumerWidget {
   const OverviewPage({super.key});
@@ -116,7 +116,7 @@ class OverviewPage extends ConsumerWidget {
             mainAxisSpacing: 8,
           ),
           itemCount: system.vms.length,
-          itemBuilder: (_, i) => VmGaugeCard(vm: system.vms[i]),
+          itemBuilder: (_, i) => VmRingCard(vm: system.vms[i]),
         );
       },
       loading: () => const SizedBox.shrink(),
