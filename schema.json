@@ -1,0 +1,206 @@
+# Mission Control – JSON Report Schema
+
+Die Monitoring Crew schreibt täglich eine strukturierte JSON-Datei parallel zum Markdown-Report.
+Diese Datei wird vom FastAPI Backend gelesen und über `/api/missioncontrol/{location}/` ausgeliefert.
+
+**Dateiname:** `report_YYYY-MM-DD.json`  
+**Pfad:** `~/agent-templates/monitoring/reports/`  
+**Encoding:** UTF-8
+
+---
+
+## Top-Level Struktur
+
+```json
+{
+  "report_date": "2026-05-27",
+  "report_time": "08:02",
+  "generator": "monitoring-crew",
+  "location": "home-lab",
+  "overview": { ... },
+  "system": { ... },
+  "health": { ... }
+}
+```
+
+| Feld | Typ | Beschreibung |
+|------|-----|-------------|
+| `report_date` | string | Datum im Format `YYYY-MM-DD` |
+| `report_time` | string | Uhrzeit im Format `HH:MM` |
+| `generator` | string | Identifikation des Generators (`"monitoring-crew"`) |
+| `location` | string | Standort: `"home-lab"` oder `"production-center"` |
+| `overview` | object | Übersichtsdaten (siehe unten) |
+| `system` | object | Systemdaten inkl. VMs, Services, Backups |
+| `health` | object | Health-Score-Berechnung |
+
+---
+
+## `overview` – Übersicht
+
+```json
+{
+  "status": "warning",
+  "health_score": 75,
+  "disk_usage": {
+    "NVMe (1 TB)": 9.0,
+    "USB (3 TB)": 88.0,
+    "VM 100": 6.0,
+    "LXC 102": 28.0,
+    "LXC 103": 47.0,
+    "LXC 104": 28.0
+  },
+  "crew_status": "completed",
+  "active_alerts": [
+    "VM 101 seit 10 Tagen kein Backup",
+    "VM 101 Reboot erforderlich (Kernel)"
+  ]
+}
+```
+
+| Feld | Typ | Beschreibung |
+|------|-----|-------------|
+| `status` | string | `"ok"` \| `"warning"` \| `"critical"` |
+| `health_score` | int | 0–100, aggregierter Zustandswert |
+| `disk_usage` | dict | Key = Name, Value = Prozent-Auslastung (float) |
+| `crew_status` | string | `"completed"` \| `"failed"` \| `"running"` |
+| `active_alerts` | list[str] | Kritische Warnungen als Text |
+
+---
+
+## `system` – Systemdaten
+
+```json
+{
+  "host": {
+    "cpu_percent": 17.0,
+    "ram_percent": 53.1,
+    "uptime": "8 Tage, 16 Stunden",
+    "kernel_version": "6.8.12-23-pve #1 SMP PREEMPT_DYNAMIC PMX",
+    "updates_pending": true
+  },
+  "vms": [
+    {
+      "name": "VM 101: ai-agents",
+      "status": "running",
+      "cpu_percent": 6.48,
+      "ram_percent": 78.8,
+      "disk_percent": 28.0,
+      "uptime_days": 8
+    }
+  ],
+  "services": [
+    {
+      "name": "Apache",
+      "online": true,
+      "port": 443
+    },
+    {
+      "name": "MariaDB",
+      "online": true,
+      "port": 3306
+    },
+    {
+      "name": "Redis",
+      "online": true,
+      "port": 6379
+    }
+  ],
+  "backups": [
+    {
+      "vm_name": "VM 100 (Nextcloud)",
+      "last_backup": "2026-05-24T00:00:00",
+      "success": true
+    },
+    {
+      "vm_name": "VM 101 (AI Agents)",
+      "last_backup": "2026-05-17T00:00:00",
+      "success": false
+    }
+  ]
+}
+```
+
+### `host` – Proxmox-Host
+
+| Feld | Typ | Beschreibung |
+|------|-----|-------------|
+| `cpu_percent` | float | CPU-Auslastung % |
+| `ram_percent` | float | RAM-Auslastung % |
+| `uptime` | string | Menschl. lesbare Uptime |
+| `kernel_version` | string | Kernel-Version |
+| `updates_pending` | bool | Stehen Updates an? |
+
+### `vms[]` – VM/LXC-Status
+
+| Feld | Typ | Beschreibung |
+|------|-----|-------------|
+| `name` | string | Anzeigename (z.B. `"VM 100: Nextcloud"`) |
+| `status` | string | `"running"` \| `"stopped"` \| `"paused"` |
+| `cpu_percent` | float | CPU-Auslastung % |
+| `ram_percent` | float | RAM-Auslastung % |
+| `disk_percent` | float | Disk-Auslastung % |
+| `uptime_days` | int | Uptime in Tagen |
+
+### `services[]` – Dienst-Status
+
+| Feld | Typ | Beschreibung |
+|------|-----|-------------|
+| `name` | string | Dienst-Name |
+| `online` | bool | Läuft der Dienst? |
+| `port` | int | Port (0 wenn unbekannt) |
+
+### `backups[]` – Backup-Status
+
+| Feld | Typ | Beschreibung |
+|------|-----|-------------|
+| `vm_name` | string | Name der VM |
+| `last_backup` | string | ISO-Datetime des letzten Backups |
+| `success` | bool | War das Backup erfolgreich? |
+
+---
+
+## `health` – Health Score
+
+```json
+{
+  "score": 75,
+  "level": "warning",
+  "vm_health": 100.0,
+  "service_health": 100.0,
+  "audit_health": 25.0,
+  "calculated_at": "2026-05-27T08:02:00"
+}
+```
+
+| Feld | Typ | Beschreibung |
+|------|-----|-------------|
+| `score` | int | 0–100 Gesamt-Score |
+| `level` | string | `"good"` (80+), `"warning"` (50–79), `"critical"` (<50) |
+| `vm_health` | float | VM/LXC-Teilscore 0–100 |
+| `service_health` | float | Dienst-Teilscore 0–100 |
+| `audit_health` | float | Security-Audit-Teilscore 0–100 |
+| `calculated_at` | string | ISO-Timestamp der Berechnung |
+
+---
+
+## Code Quality (separate Datei)
+
+Die Security-Audit-Daten kommen aus `~/agent-templates/monitoring/security_audit_log.json`  
+und werden vom Backend direkt geparst. Das Format bleibt wie bisher:
+
+```json
+{
+  "timestamp": "2026-05-27T08:02:00",
+  "service": "security-audit",
+  "findings": [
+    {
+      "type": "ssl_verify_disabled",
+      "severity": "high",
+      "detail": "SSL verify=False in collect_status.py:65",
+      "fix": "Set verify=True or use proper SSL context",
+      "auto_fixed": false
+    }
+  ],
+  "auto_fix_results": []
+}
+```
