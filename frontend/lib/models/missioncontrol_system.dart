@@ -99,6 +99,8 @@ class SysUpdate {
   final bool rebootNeeded;
   final String kernel;
   final List<String> autoFixes;
+  final List<String> warnings;
+  final List<String> details;
 
   const SysUpdate({
     required this.system,
@@ -106,6 +108,8 @@ class SysUpdate {
     required this.rebootNeeded,
     required this.kernel,
     required this.autoFixes,
+    required this.warnings,
+    required this.details,
   });
 
   factory SysUpdate.fromJson(Map<String, dynamic> json) {
@@ -115,6 +119,8 @@ class SysUpdate {
       rebootNeeded: json['reboot_needed'] as bool? ?? false,
       kernel: json['kernel'] as String? ?? '',
       autoFixes: (json['auto_fixes'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      warnings: (json['warnings'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      details: (json['details'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
     );
   }
 }

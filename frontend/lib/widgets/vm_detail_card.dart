@@ -27,31 +27,75 @@ class VmDetailCard extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                 ),
-                if (update != null && update!.updatesPending > 0)
-                  _tag('${update!.updatesPending} Updates', AppTheme.gold),
                 if (update != null && update!.rebootNeeded)
-                  _tag('Reboot', AppTheme.red),
+                  _tag('Reboot nötig', AppTheme.red),
               ],
             ),
             const SizedBox(height: 10),
             _metricBar('CPU', vm.cpuPercent, AppTheme.blue),
             _metricBar('RAM', vm.ramPercent, AppTheme.gold),
             _metricBar('Disk', vm.diskPercent, AppTheme.green),
-            if (update != null && update!.autoFixes.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.auto_fix_high, size: 13, color: AppTheme.green),
-                  const SizedBox(width: 4),
-                  Expanded(
+            if (update != null) ...[
+              if (update!.kernel.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.memory, size: 12, color: Colors.white38),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        update!.kernel,
+                        style: const TextStyle(fontSize: 10, color: Colors.white54, fontFamily: 'monospace'),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (update!.autoFixes.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                const Divider(height: 1, color: Colors.white12),
+                const SizedBox(height: 4),
+                ...update!.autoFixes.take(3).map((f) => Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.check_circle_outline, size: 11, color: AppTheme.green),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(f, style: const TextStyle(fontSize: 10, color: Colors.white54)),
+                          ),
+                        ],
+                      ),
+                    )),
+                if (update!.autoFixes.length > 3)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
                     child: Text(
-                      update!.autoFixes.take(2).join(' · '),
-                      style: const TextStyle(fontSize: 10, color: Colors.white54),
-                      overflow: TextOverflow.ellipsis,
+                      '+ ${update!.autoFixes.length - 3} weitere',
+                      style: const TextStyle(fontSize: 9, color: Colors.white30),
                     ),
                   ),
-                ],
-              ),
+              ],
+              if (update!.warnings.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                const Divider(height: 1, color: Colors.white12),
+                const SizedBox(height: 4),
+                ...update!.warnings.take(2).map((w) => Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.warning_amber, size: 11, color: AppTheme.gold),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(w, style: const TextStyle(fontSize: 10, color: Colors.white54)),
+                          ),
+                        ],
+                      ),
+                    )),
+              ],
             ],
           ],
         ),
@@ -93,6 +137,7 @@ class VmDetailCard extends StatelessWidget {
   Widget _tag(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      margin: const EdgeInsets.only(left: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),

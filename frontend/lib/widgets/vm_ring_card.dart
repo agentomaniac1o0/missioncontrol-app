@@ -10,26 +10,25 @@ class VmRingCard extends StatelessWidget {
   const VmRingCard({super.key, required this.vm});
 
   static const _colors = [
-    ('CPU', AppTheme.blue),
-    ('RAM', AppTheme.gold),
-    ('Disk', AppTheme.green),
+    _RingInfo('CPU', AppTheme.blue),
+    _RingInfo('RAM', AppTheme.gold),
+    _RingInfo('Disk', AppTheme.green),
   ];
 
   @override
   Widget build(BuildContext context) {
     final values = [vm.cpuPercent, vm.ramPercent, vm.diskPercent];
-    final hasData = values.any((v) => v > 0);
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         child: Row(
           children: [
             SizedBox(
-              width: 64,
-              height: 64,
+              width: 68,
+              height: 68,
               child: CustomPaint(
-                painter: _RingPainter(values: values),
+                painter: _TreeRingPainter(values: values),
               ),
             ),
             const SizedBox(width: 10),
@@ -52,31 +51,30 @@ class VmRingCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 2,
-                    children: List.generate(3, (i) {
-                      final pct = values[i];
-                      return Row(
+                  ...List.generate(3, (i) {
+                    final pct = values[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             width: 7,
                             height: 7,
                             decoration: BoxDecoration(
-                              color: _colors[i].$2,
+                              color: _colors[i].color,
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 4),
                           Text(
-                            '${_colors[i].$1} ${pct.toStringAsFixed(0)}%',
+                            '${_colors[i].label} ${pct.toStringAsFixed(0)}%',
                             style: TextStyle(fontSize: 10, color: Colors.white54),
                           ),
                         ],
-                      );
-                    }),
-                  ),
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -87,51 +85,55 @@ class VmRingCard extends StatelessWidget {
   }
 }
 
-class _RingPainter extends CustomPainter {
+class _RingInfo {
+  final String label;
+  final Color color;
+  const _RingInfo(this.label, this.color);
+}
+
+class _TreeRingPainter extends CustomPainter {
   final List<double> values;
 
-  _RingPainter({required this.values});
+  _TreeRingPainter({required this.values});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final maxRadius = size.width / 2 - 2;
-    final ringWidth = 5.0;
-    final innerPad = 10.0;
-    final totalRings = VmRingCard._colors.length;
+    final outerRadius = size.width / 2 - 2;
+    final ringCount = VmRingCard._colors.length;
+    final ringWidth = (outerRadius - 6) / ringCount;
 
-    for (int i = 0; i < totalRings; i++) {
-      final radius = maxRadius - innerPad - (i * (ringWidth + 1));
-      final pct = (values[i] / 100).clamp(0.01, 1.0); // min 1% for visibility
+    for (int i = 0; i < ringCount; i++) {
+      final innerR = 4 + (i * ringWidth);
+      final outerR = innerR + ringWidth;
+      final pct = (values[i] / 100).clamp(0.0, 1.0);
+      final color = VmRingCard._colors[i].color;
 
-      final paint = Paint()
-        ..color = VmRingCard._colors[i].$2.withValues(alpha: 0.9)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = ringWidth
-        ..strokeCap = StrokeCap.round;
-
-      final rect = Rect.fromCircle(center: center, radius: radius);
-      canvas.drawArc(
-        rect,
-        -pi / 2, // start from top (12 o'clock)
-        pct * 2 * pi,
-        false,
-        paint,
-      );
-
-      // Background ring
+      // Background ring (dark)
       final bgPaint = Paint()
-        ..color = AppTheme.surface.withValues(alpha: 0.6)
+        ..color = AppTheme.surface
         ..style = PaintingStyle.stroke
-        ..strokeWidth = ringWidth;
+        ..strokeWidth = ringWidth - 1;
 
-      canvas.drawArc(
-        rect,
-        (-pi / 2) + (pct * 2 * pi),
-        (1 - pct) * 2 * pi,
-        false,
-        bgPaint,
-      );
+      canvas.drawCircle(center, innerR + ringWidth / 2, bgPaint);
+
+      // Filled arc
+      if (pct > 0.01) {
+        final fillPaint = Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = ringWidth - 1
+          ..strokeCap = StrokeCap.round;
+
+        final rect = Rect.fromCircle(center: center, radius: innerR + ringWidth / 2);
+        canvas.drawArc(
+          rect,
+          -pi / 2,
+          pct * 2 * pi,
+          false,
+          fillPaint,
+        );
+      }
     }
   }
 
