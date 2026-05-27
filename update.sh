@@ -16,7 +16,7 @@ RESET="\033[0m"
 API_URL="${API_BASE_URL:-http://100.103.32.107:8000}"
 MISSION_DIR="${MISSION_DIR:-$HOME/missioncontrol-app}"
 TRADING_DIR="${TRADING_DIR:-$HOME/trading-app}"
-SERVER_SSH="${SERVER_SSH:-ai-agents}"
+SERVER_SSH="${SERVER_SSH:-100.103.32.107}"
 
 action="${1:-frontend}"
 
@@ -60,7 +60,7 @@ do_backend() {
     fi
 
     ssh "$SERVER_SSH" "
-        cd $TRADING_DIR && git pull && systemctl --user restart trading-backend
+        cd $TRADING_DIR && git pull && backend/.venv/bin/pip install networkx matplotlib -q --break-system-packages && systemctl --user restart trading-backend
     "
     sleep 2
 
