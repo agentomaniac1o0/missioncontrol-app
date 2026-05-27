@@ -76,3 +76,10 @@ final graphiphySvgUrlProvider = Provider.family<String, String>((ref, location) 
 final graphiphyPngUrlProvider = Provider.family<String, String>((ref, location) {
   return ApiConfig.graphiphyPngUrl(location);
 });
+
+final graphiphyRefreshProvider =
+    FutureProvider.family<Map<String, dynamic>, String>((ref, location) async {
+  final dio = ref.watch(dioProvider);
+  final response = await dio.post(ApiConfig.graphiphyVizUrl(location) + '/refresh');
+  return response.data as Map<String, dynamic>;
+});

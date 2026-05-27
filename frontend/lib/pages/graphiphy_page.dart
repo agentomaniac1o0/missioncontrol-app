@@ -88,6 +88,7 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
   Widget _buildGraphTab(String location) {
     final pngUrl = ref.watch(graphiphyPngUrlProvider(location));
     final vizUrl = ref.watch(graphiphyVizUrlProvider(location));
+    final refreshAsync = ref.watch(graphiphyRefreshProvider(location));
 
     return Stack(
       children: [
@@ -117,6 +118,21 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
         ),
         Positioned(
           right: 12,
+          top: 12,
+          child: FloatingActionButton.small(
+            heroTag: 'refresh_graph',
+            onPressed: () => _refreshGraph(location),
+            backgroundColor: AppTheme.blue,
+            child: refreshAsync.isLoading
+                ? const SizedBox(
+                    width: 16, height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Icon(Icons.refresh, size: 18),
+          ),
+        ),
+        Positioned(
+          right: 12,
           bottom: 12,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -137,6 +153,19 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
         ),
       ],
     );
+  }
+
+  void _refreshGraph(String location) {
+    ref.read(graphiphyRefreshProvider(location));
+    Future.delayed(const Duration(seconds: 2), () {
+      ref.invalidate(graphiphyPngUrlProvider(location));
+      ref.invalidate(graphiphyRefreshProvider(location));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Graph neu gebaut'), duration: Duration(seconds: 2)),
+        );
+      }
+    });
   }
 
   Future<void> _openInBrowser(String url) async {
