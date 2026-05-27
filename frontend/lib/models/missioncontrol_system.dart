@@ -93,17 +93,45 @@ class BackupStatus {
   }
 }
 
+class SysUpdate {
+  final String system;
+  final int updatesPending;
+  final bool rebootNeeded;
+  final String kernel;
+  final List<String> autoFixes;
+
+  const SysUpdate({
+    required this.system,
+    required this.updatesPending,
+    required this.rebootNeeded,
+    required this.kernel,
+    required this.autoFixes,
+  });
+
+  factory SysUpdate.fromJson(Map<String, dynamic> json) {
+    return SysUpdate(
+      system: json['system'] as String? ?? '',
+      updatesPending: json['updates_pending'] as int? ?? 0,
+      rebootNeeded: json['reboot_needed'] as bool? ?? false,
+      kernel: json['kernel'] as String? ?? '',
+      autoFixes: (json['auto_fixes'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+    );
+  }
+}
+
 class MissioncontrolSystem {
   final ProxmoxHost host;
   final List<VmStatus> vms;
   final List<ServiceStatus> services;
   final List<BackupStatus> backups;
+  final List<SysUpdate> updates;
 
   const MissioncontrolSystem({
     required this.host,
     required this.vms,
     required this.services,
     required this.backups,
+    required this.updates,
   });
 
   factory MissioncontrolSystem.fromJson(Map<String, dynamic> json) {
@@ -121,6 +149,10 @@ class MissioncontrolSystem {
               ?.map((e) => BackupStatus.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      updates: (json['updates'] as List<dynamic>?)
+              ?.map((e) => SysUpdate.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
@@ -136,6 +168,7 @@ class MissioncontrolSystem {
       vms: [],
       services: [],
       backups: [],
+      updates: [],
     );
   }
 }

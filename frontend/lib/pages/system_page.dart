@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
+import '../models/missioncontrol_system.dart';
 import '../providers/missioncontrol_provider.dart';
 import '../widgets/health_dot.dart';
 import '../widgets/refresh_badge.dart';
-import '../widgets/vm_card.dart';
+import '../widgets/vm_gauge_card.dart';
 
 class SystemPage extends ConsumerWidget {
   const SystemPage({super.key});
@@ -28,6 +29,8 @@ class SystemPage extends ConsumerWidget {
           _buildServiceSection(systemAsync),
           const SizedBox(height: 12),
           _buildBackupSection(systemAsync),
+          const SizedBox(height: 12),
+          _buildUpdateSection(systemAsync),
         ],
       ),
     );
@@ -47,8 +50,8 @@ class SystemPage extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _gaugeChart('CPU', host.cpuPercent)),
-                    Expanded(child: _gaugeChart('RAM', host.ramPercent)),
+                    Expanded(child: _gaugeChart('CPU', host.cpuPercent, AppTheme.blue)),
+                    Expanded(child: _gaugeChart('RAM', host.ramPercent, AppTheme.gold)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -65,12 +68,7 @@ class SystemPage extends ConsumerWidget {
     );
   }
 
-  Widget _gaugeChart(String label, double percent) {
-    final color = percent >= 90
-        ? AppTheme.red
-        : percent >= 70
-            ? AppTheme.gold
-            : AppTheme.green;
+  Widget _gaugeChart(String label, double percent, Color color) {
     return Column(
       children: [
         SizedBox(
@@ -128,12 +126,12 @@ class SystemPage extends ConsumerWidget {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 1.6,
+                childAspectRatio: 1.3,
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
               ),
               itemCount: system.vms.length,
-              itemBuilder: (_, i) => VmCard(vm: system.vms[i]),
+              itemBuilder: (_, i) => VmGaugeCard(vm: system.vms[i]),
             ),
           ],
         );
@@ -161,10 +159,11 @@ class SystemPage extends ConsumerWidget {
                           HealthDot(status: s.online ? 'online' : 'offline', size: 8),
                           const SizedBox(width: 8),
                           Expanded(child: Text(s.name, style: const TextStyle(fontSize: 12))),
-                          Text(
-                            'Port ${s.port}',
-                            style: const TextStyle(fontSize: 10, color: Colors.white38),
-                          ),
+                          if (s.port > 0)
+                            Text(
+                              'Port ${s.port}',
+                              style: const TextStyle(fontSize: 10, color: Colors.white38),
+                            ),
                         ],
                       ),
                     )),
@@ -214,6 +213,64 @@ class SystemPage extends ConsumerWidget {
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildUpdateSection(AsyncValue async) {
+    return async.when(
+      data: (system) {
+        if (system.updates.isEmpty) return const SizedBox.shrink();
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SectionHeader(title: 'Updates & Wartung', frequency: RefreshFrequency.daily),
+                const SizedBox(height: 8),
+                ...system.updates.map((u) => _updateRow(u)),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _updateRow(SysUpdate u) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(u.system, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+          ),
+          if (u.updatesPending > 0)
+            _tag('${u.updatesPending} Updates', AppTheme.gold)
+          else
+            _tag('aktuell', AppTheme.green),
+          const SizedBox(width: 6),
+          if (u.rebootNeeded)
+            _tag('Reboot', AppTheme.red),
+          const Spacer(),
+          if (u.autoFixes.isNotEmpty)
+            Icon(Icons.auto_fix_high, size: 14, color: AppTheme.green),
+        ],
+      ),
+    );
+  }
+
+  Widget _tag(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(text, style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.w600)),
     );
   }
 }
