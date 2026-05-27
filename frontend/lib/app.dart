@@ -5,6 +5,7 @@ import 'pages/overview_page.dart';
 import 'pages/system_page.dart';
 import 'pages/code_quality_page.dart';
 import 'providers/missioncontrol_provider.dart';
+import 'providers/live_provider.dart';
 import 'widgets/refresh_badge.dart';
 
 class MissionControlApp extends ConsumerWidget {
@@ -41,6 +42,17 @@ class MissionControlApp extends ConsumerWidget {
               ],
             ),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh, size: 20),
+                tooltip: 'Daten aktualisieren',
+                onPressed: () {
+                  final loc = ref.read(locationProvider);
+                  ref.invalidate(missioncontrollerOverviewProvider(loc));
+                  ref.invalidate(missioncontrollerSystemProvider(loc));
+                  ref.invalidate(missioncontrollerCodeQualityProvider(loc));
+                  ref.invalidate(missioncontrollerHealthProvider(loc));
+                },
+              ),
               _LocationToggle(location: location),
               const SizedBox(width: 8),
             ],

@@ -5,7 +5,7 @@ import '../models/missioncontrol_system.dart';
 import '../providers/missioncontrol_provider.dart';
 import '../widgets/health_dot.dart';
 import '../widgets/refresh_badge.dart';
-import '../widgets/vm_ring_card.dart';
+import '../widgets/vm_detail_card.dart';
 
 class SystemPage extends ConsumerWidget {
   const SystemPage({super.key});
@@ -121,18 +121,16 @@ class SystemPage extends ConsumerWidget {
           children: [
             SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily),
             const SizedBox(height: 8),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1.3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: system.vms.length,
-              itemBuilder: (_, i) => VmRingCard(vm: system.vms[i]),
-            ),
+            ...system.vms.map((vm) {
+              final upd = system.updates.cast<SysUpdate?>().firstWhere(
+                    (u) => u != null && vm.name.toLowerCase().contains(u.system.toLowerCase().replaceAll(RegExp(r'\(.*?\)'), '').trim().toLowerCase()),
+                    orElse: () => null,
+                  );
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: VmDetailCard(vm: vm, update: upd),
+              );
+            }),
           ],
         );
       },
@@ -254,7 +252,7 @@ class SystemPage extends ConsumerWidget {
             _tag('aktuell', AppTheme.green),
           const SizedBox(width: 6),
           if (u.rebootNeeded)
-            _tag('Reboot', AppTheme.red),
+            _tag('Reboot nötig', AppTheme.red),
           const Spacer(),
           if (u.autoFixes.isNotEmpty)
             Icon(Icons.auto_fix_high, size: 14, color: AppTheme.green),
