@@ -193,19 +193,29 @@ class SystemPage extends ConsumerWidget {
                 SectionHeader(title: 'Backups', frequency: RefreshFrequency.daily),
                 ...system.backups.map((b) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            b.success ? Icons.check_circle : Icons.error,
-                            size: 16,
-                            color: b.success ? AppTheme.green : AppTheme.red,
+                          Row(
+                            children: [
+                              Icon(
+                                b.success ? Icons.check_circle : Icons.error,
+                                size: 16,
+                                color: b.success ? AppTheme.green : AppTheme.red,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(b.vmName, style: const TextStyle(fontSize: 12))),
+                              Text(
+                                '${b.lastBackup.day}.${b.lastBackup.month}.',
+                                style: const TextStyle(fontSize: 10, color: Colors.white38),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(b.vmName, style: const TextStyle(fontSize: 12))),
-                          Text(
-                            '${b.lastBackup.day}.${b.lastBackup.month}.',
-                            style: const TextStyle(fontSize: 10, color: Colors.white38),
-                          ),
+                          if (b.detail.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 24, top: 1),
+                              child: Text(b.detail, style: const TextStyle(fontSize: 10, color: Colors.white30)),
+                            ),
                         ],
                       ),
                     )),

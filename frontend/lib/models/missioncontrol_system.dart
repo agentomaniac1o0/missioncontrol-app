@@ -77,11 +77,13 @@ class BackupStatus {
   final String vmName;
   final DateTime lastBackup;
   final bool success;
+  final String detail;
 
   const BackupStatus({
     required this.vmName,
     required this.lastBackup,
     required this.success,
+    required this.detail,
   });
 
   factory BackupStatus.fromJson(Map<String, dynamic> json) {
@@ -95,6 +97,7 @@ class BackupStatus {
       vmName: json['vm_name'] as String? ?? '',
       lastBackup: parsedBackup,
       success: json['success'] as bool? ?? false,
+      detail: json['detail'] as String? ?? '',
     );
   }
 }
