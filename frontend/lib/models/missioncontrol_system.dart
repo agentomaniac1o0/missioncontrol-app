@@ -85,9 +85,15 @@ class BackupStatus {
   });
 
   factory BackupStatus.fromJson(Map<String, dynamic> json) {
+    DateTime parsedBackup;
+    try {
+      parsedBackup = DateTime.parse(json['last_backup'] as String);
+    } catch (_) {
+      parsedBackup = DateTime.now();
+    }
     return BackupStatus(
-      vmName: json['vm_name'] as String,
-      lastBackup: DateTime.parse(json['last_backup'] as String),
+      vmName: json['vm_name'] as String? ?? '',
+      lastBackup: parsedBackup,
       success: json['success'] as bool? ?? false,
     );
   }

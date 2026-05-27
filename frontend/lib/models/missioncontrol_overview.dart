@@ -16,9 +16,15 @@ class MissioncontrolOverview {
   });
 
   factory MissioncontrolOverview.fromJson(Map<String, dynamic> json) {
+    DateTime parsedReport;
+    try {
+      parsedReport = DateTime.parse(json['last_report'] as String);
+    } catch (_) {
+      parsedReport = DateTime.now();
+    }
     return MissioncontrolOverview(
       status: json['status'] as String? ?? 'unknown',
-      lastReport: DateTime.parse(json['last_report'] as String),
+      lastReport: parsedReport,
       healthScore: json['health_score'] as int? ?? 0,
       diskUsage: (json['disk_usage'] as Map<String, dynamic>?)?.map(
             (k, v) => MapEntry(k, (v as num).toDouble()),
