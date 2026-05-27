@@ -296,7 +296,35 @@ cd ~/trading-app && git pull && systemctl --user restart trading-backend
 - Neue Backend-Endpoints: `/graphiphy/stats`, `/god-nodes`, `/communities`, `/community/{id}`, `/search`, `/viz`, `/viz/refresh`
 - `graph.html` generiert (Top-500 Communities, 442KB, aggregierte D3.js-Visualisierung)
 - `url_launcher` statt `flutter_inappwebview` (kein Linux-Plugin)
-- Code: `schemas.py` (+4 Klassen), `missioncontrol.py` (+200 Zeilen), Flutter: 5 neue Dateien
+
+### Berichte-Tab + Live-Upgrades
+- **Berichte-Tab (Tab 6)**: Letzte 5 Monitoring-Reports mit Markdown-Detailansicht
+- **Live-Endpoint**: Echte parallele Ping-Heartbeats (asyncio, max 3s) + TCP-Service-Checks
+- **Hybrid-Checks**: TCP für externe Services (Apache, Ghost, ComfyUI), Report-basierte für interne (MariaDB, Redis)
+- **Graph-Refresh-Button**: FAB im Graphiphy-Tab → `graphify update` + `cluster-only` + neues PNG
+- **PNG-Rendering**: matplotlib spring_layout (200 DPI, Dark-Theme) statt fehlerhaftem SVG
+
+### Push-Benachrichtigungen + Health-Trend
+- **Push**: `flutter_local_notifications` auf Linux Desktop (5min Timer), Android ohne Workmanager (Startup-Crash)
+- **Health-Trend**: 14-Tage fl_chart LineChart auf der Übersichts-Seite
+- **Tab-Badge**: Roter Badge am Live-Tab bei kritischen Issues (Critical-Count)
+- **Notification-Dedup**: Alarmiert nur bei neuen Issues, nicht wiederholt
+
+### Android
+- Workmanager komplett entfernt (Crash-Ursache: Background-Isolate + Dio-Inkompatibilität)
+- `Platform.isAndroid` Guard: Keine Notification/Poller-Init auf Android
+- APK in Nextcloud: `Home Lab/missioncontrol_app/`
+
+### Bereinigung
+- `flutter_svg` entfernt (ungenutzt nach PNG-Switch)
+- `flutter_inappwebview` → `url_launcher` (Öffnet Graph im System-Browser)
+- `update.sh`: SSH-Host auf IP `100.103.32.107` gefixt, `pip install networkx matplotlib` eingebaut
+
+### Neue Dateien
+- `models/missioncontrol_graphiphy.dart`, `models/missioncontrol_reports.dart`
+- `providers/graphiphy_provider.dart`, `providers/reports_provider.dart`
+- `pages/graphiphy_page.dart`, `pages/live_page.dart`, `pages/reports_page.dart`
+- `services/notification_service.dart`
 
 ### Initial Setup & Rename
 - monitoring-app → missioncontrol-app (komplettes Rebranding)
