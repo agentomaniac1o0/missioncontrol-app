@@ -1,28 +1,30 @@
-# Monitoring App – Projektanweisungen
+# Mission Control App – Projektanweisungen
 
 ## Projektziel
 
-Cross-Platform Monitoring App (FastAPI + Flutter) für Home Lab (pve-1) und Production Center.
-Ersetzt Discord-Berichte und die Streamlit Mission Control durch eine native Flutter-App.
+Cross-Platform Mission Control App (FastAPI + Flutter) für Home Lab (pve-1) und Production Center (Dell OptiPlex).
+Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine native Flutter-App mit Push-Benachrichtigungen.
 
-**Repo:** `~/monitoring-app/` (öffentlich auf GitHub)
+**Repo:** `~/missioncontrol-app/` (öffentlich auf GitHub)
 **Backend:** Bestehender FastAPI-Backend in `~/trading-app/backend/` wird erweitert
 
 ## Architektur
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Flutter Frontend (Web + Mobile)                      │
-│  monitoring-app/                                       │
+│  Flutter Frontend (Linux Desktop + Android)           │
+│  missioncontrol-app/                                   │
 │  Globaler Toggle: Home Lab ↔ Production Center        │
 │  Tabs: Übersicht · System · Code Quality              │
-│  Jeder Tab: statischer Report-Teil + Live-Health      │
+│  Health Score + grafische Darstellung aller Komp.     │
+│  Push-Benachrichtigungen bei Critical-Issues          │
 └────────────────────────┬────────────────────────────┘
                          │ HTTP/JSON
 ┌────────────────────────▼────────────────────────────┐
 │  FastAPI Backend (trading-app/backend)                │
-│  Neue Router: /api/monitoring/                        │
+│  Neue Router: /api/missioncontrol/                    │
 │  Health-Check Hintergrund-Task (stündlich)            │
+│  Health Score Berechnung                              │
 │  SSH-Pull vom production-center                       │
 │  RPi-Watchdog: externe Ping-Daten per SSH             │
 └──┬──────────────────────┬───────────────────────────┘
@@ -37,7 +39,7 @@ Ersetzt Discord-Berichte und die Streamlit Mission Control durch eine native Flu
 └──────────────┘  └──────────────────────┘
 ```
 
-## Architektur-Entscheidungen (Grill-Me Session 2026-05-25)
+## Architektur-Entscheidungen
 
 | # | Entscheidung | Gewählt |
 |---|-------------|---------|
@@ -46,52 +48,52 @@ Ersetzt Discord-Berichte und die Streamlit Mission Control durch eine native Flu
 | 3 | Monitoring-Umfang production-center | Gleicher Umfang wie Home Lab (eigene Crew existiert) |
 | 4 | Datenformat | Strukturiertes JSON |
 | 5 | JSON-Generierung | Crew schreibt JSON + Markdown |
-| 6 | App-Integration | Separate Flutter-App (`monitoring-app`) |
+| 6 | App-Integration | Separate Flutter-App (`missioncontrol-app`) |
 | 7 | Standort-Toggle | Globaler Switch in AppBar + gleiche Tabs für beide |
-| 8 | Tabs | Übersicht, System, Code Quality (Monitoring-Kern) |
-| 9 | Backend-Endpoints | Sammel-Endpoint pro Tab: `/api/monitoring/{location}/{tab}` |
+| 8 | Tabs | Übersicht, System, Code Quality (Mission-Core) |
+| 9 | Backend-Endpoints | Sammel-Endpoint pro Tab: `/api/missioncontrol/{location}/{tab}` |
 | 10 | Live-Daten | Backend macht eigene Service-Health-Checks |
 | 11 | RPi-Aufteilung | RPi nur externe Pings, Backend alle internen Services |
-
-## Datenfluss
-
-### Statische Daten (täglich, aus Reports)
-```
-monitoring_crew.py → report_YYYY-MM-DD.json → /api/monitoring/{location}/overview
-                    → report_YYYY-MM-DD.json → /api/monitoring/{location}/system
-                    → security_audit_log.json → /api/monitoring/{location}/code-quality
-```
-
-### Live-Daten (stündlich, Health Checks)
-```
-Backend Background Task → ping + port-check aller Services
-RPi Watchdog → externe Ping-Daten per SSH-Pull
-→ /api/monitoring/{location}/live
-```
+| 12 | API-Kosten-Tracking | **Raus** — OpenCode Go-Kosten lokal nicht trackbar |
+| 13 | Push-Benachrichtigungen | Linux Desktop + Android, auch im Hintergrund |
+| 14 | Push-Architektur | Workmanager + flutter_local_notifications (kein externer Dienst) |
+| 15 | Health Score | Dedizierter Endpoint `/api/missioncontrol/{location}/health`, Backend berechnet |
+| 16 | Discord | Wird später stillgelegt, Push + Nextcloud als Ersatzkanäle |
+| 17 | Nextcloud | Crew schreibt automatisch per WebDAV, App liest nur via API |
 
 ## Backend-Endpoints (zu implementieren in trading-app/backend)
 
 | Endpoint | Beschreibung | Quelle |
 |----------|-------------|--------|
-| `GET /api/monitoring/{location}/overview` | Gesamtstatus, Disks, Crew-Status, Alerts | Report-JSON |
-| `GET /api/monitoring/{location}/system` | Proxmox-Host, VMs, Services, Backups | Report-JSON |
-| `GET /api/monitoring/{location}/code-quality` | Security-Audit, Code-Review-Findings | Audit-JSON |
-| `GET /api/monitoring/{location}/live` | Health-Checks, Heartbeat, RPi-Pings | Background-Task + RPi |
+| `GET /api/missioncontrol/{location}/overview` | Gesamtstatus, Health Score, Disks, Crew-Status, Alerts | Report-JSON |
+| `GET /api/missioncontrol/{location}/system` | Proxmox-Host, VMs, Services, Backups | Report-JSON |
+| `GET /api/missioncontrol/{location}/code-quality` | Security-Audit, Code-Review-Findings | Audit-JSON |
+| `GET /api/missioncontrol/{location}/live` | Health-Checks, Heartbeat, RPi-Pings | Background-Task + RPi |
+| `GET /api/missioncontrol/{location}/health` | Health Score (0–100), aggregiert aus VM/Service/Audit-Status | Background-Task |
 
 `{location}` = `home-lab` | `production-center`
+
+## Implementierungs-Reihenfolge
+
+1. **Phase 1 — Home Lab:** Alles für home-lab Standort aufbauen, production-center als Platzhalter
+2. **Phase 2 — Production Center:** production-center einbinden, sobald der andere Rechner bereit ist
 
 ## Flutter App Tabs
 
 ### Tab 1 – Übersicht
-- Gesamtstatus (OK / Warning / Critical) mit Ampel
+- **Health Score** (0–100) — großer, zentraler Indikator mit Farbverlauf (rot → gold → grün)
+- Gesamtstatus (OK / Warning / Critical)
 - Letzter Report-Zeitstempel
-- Disk-Usage aller Systeme (Balken mit %)
+- **Grafische Übersicht:**
+  - Disk-Usage aller Systeme (Balken mit %)
+  - VM/LXC-Grid mit Status-Indikatoren (kompakt)
+  - Service-Matrix (alle Services als grüne/gelbe/rote Punkte)
 - Crew-Run-Status
 - Aktive Alerts/Warnings
-- **Live:** Heartbeat-Indikatoren (grün/gelb/rot)
+- **Live:** Heartbeat-Indikatoren
 
 ### Tab 2 – System
-- Proxmox-Host-Status (CPU, RAM, Uptime)
+- Proxmox-Host-Status (CPU, RAM, Uptime) mit Charts
 - VM/LXC-Liste mit Status, CPU, RAM, Disk
 - Service-Status (Apache, MariaDB, Ghost, FastSD, ComfyUI, etc.)
 - Backup-Status (letztes erfolgreiches Backup pro VM)
@@ -104,6 +106,35 @@ RPi Watchdog → externe Ping-Daten per SSH-Pull
 - Offene Ports, harte Secrets, bare excepts
 - Auto-Fix-Ergebnisse (was wurde automatisch behoben)
 
+## Datenquellen & Ablage
+
+### Statische Daten (täglich, aus Reports)
+```
+monitoring_crew.py → report_YYYY-MM-DD.json → /api/missioncontrol/{location}/overview
+                    → report_YYYY-MM-DD.json → /api/missioncontrol/{location}/system
+                    → security_audit_log.json → /api/missioncontrol/{location}/code-quality
+```
+
+### Live-Daten (stündlich, Health Checks)
+```
+Backend Background Task → ping + port-check aller Services
+RPi Watchdog → externe Ping-Daten per SSH-Pull
+→ /api/missioncontrol/{location}/live
+→ /api/missioncontrol/{location}/health
+```
+
+### Nextcloud (Backup/Archiv)
+- Crew schreibt Reports automatisch per WebDAV nach Nextcloud
+- Dient als Fallback/Nachschlag, falls die App nicht verfügbar ist
+- Kein Upload-Code in der App nötig
+
+## Push-Benachrichtigungen
+
+- `flutter_local_notifications` für lokale Notifications
+- `workmanager` für periodische Background-Tasks (Android)
+- Polling des `/live`-Endpoints, Trigger bei Critical-Findings
+- Funktioniert auf Linux Desktop und Android
+
 ## Technologie-Stack
 
 | Komponente | Technologie |
@@ -112,29 +143,29 @@ RPi Watchdog → externe Ping-Daten per SSH-Pull
 | State | Riverpod 2.5+ |
 | HTTP | Dio 5.0+ |
 | Charts | fl_chart 0.69+ |
+| Push | flutter_local_notifications + workmanager |
 | Backend | FastAPI 0.115+ (in trading-app/backend) |
 | Health Checks | asyncio Background Tasks |
 | SSH-Pull | asyncssh / paramiko |
 
-## CI-Farben (wie trading-app)
+## CI-Farben
 
 | Farbe | Hex | Verwendung |
 |-------|-----|-----------|
-| Grün/Positiv | `#00b09b` | OK-Status, Online, Grün |
+| Grün/Positiv | `#00b09b` | OK-Status, Online, Gesund |
 | Rot/Negativ | `#e74c3c` | Critical, Offline, Fehler |
 | Gold | `#f0a500` | Warnings, Alerts |
 | Blau | `#3498db` | Info, Sekundär |
 | Violett | `#9b59b6` | Highlights |
 | Dunkel | `#0d1117` | Hintergrund |
 
-## Projektstruktur (geplant)
+## Projektstruktur
 
 ```
-monitoring-app/
+missioncontrol-app/
 ├── AGENTS.md
-├── ROADMAP.md
 ├── .gitignore
-├── backend/                    # Nur Health-Check-Task (Rest in trading-app/backend)
+├── backend/
 │   └── health_checker.py
 ├── frontend/
 │   ├── pubspec.yaml
@@ -145,47 +176,54 @@ monitoring-app/
 │       │   ├── api_config.dart
 │       │   └── theme.dart
 │       ├── models/
-│       │   ├── monitoring_overview.dart
-│       │   ├── monitoring_system.dart
-│       │   ├── monitoring_code_quality.dart
-│       │   └── monitoring_live.dart
+│       │   ├── missioncontrol_overview.dart
+│       │   ├── missioncontrol_system.dart
+│       │   ├── missioncontrol_code_quality.dart
+│       │   ├── missioncontrol_live.dart
+│       │   └── missioncontrol_health.dart
 │       ├── providers/
-│       │   ├── monitoring_provider.dart
+│       │   ├── missioncontrol_provider.dart
 │       │   └── live_provider.dart
 │       ├── pages/
 │       │   ├── overview_page.dart
 │       │   ├── system_page.dart
 │       │   └── code_quality_page.dart
 │       └── widgets/
-│           ├── ampel_indicator.dart
+│           ├── health_score_card.dart
 │           ├── health_dot.dart
 │           ├── disk_bar.dart
 │           ├── vm_card.dart
+│           ├── service_matrix.dart
 │           └── finding_card.dart
 └── deploy/
     └── flatpak.yml
 ```
 
-## Offen (Phase 1)
+## Phase 1 – TODO
 
-- [ ] Projekt-Setup: GitHub-Repo, AGENTS.md, Verzeichnisstruktur
+- [x] Projekt-Setup: GitHub-Repo, AGENTS.md, Verzeichnisstruktur
+- [ ] Projekt umbenannt: monitoring-app → missioncontrol-app
+- [ ] Altes mission-control Streamlit-Dashboard archiviert
 - [ ] JSON-Schema für Monitoring-Reports definieren
-- [ ] Monitoring Crews: JSON-Output parallel zu Markdown (beide Maschinen)
-- [ ] Backend: Neue Router `/api/monitoring/` in trading-app/backend
+- [ ] Monitoring Crews: JSON-Output parallel zu Markdown (Home Lab)
+- [ ] Backend: Neue Router `/api/missioncontrol/` in trading-app/backend
 - [ ] Backend: Health-Check Background-Task
-- [ ] Backend: SSH-Pull vom Production Center
+- [ ] Backend: Health Score Berechnung
+- [ ] Backend: Production Center Platzhalter-Endpoints
 - [ ] Flutter: Projekt-Scaffold (flutter create)
+- [ ] Flutter: Riverpod + Dio + fl_chart + flutter_local_notifications + workmanager
 - [ ] Flutter: Globaler Toggle + 3-Tab-Navigation
-- [ ] Flutter: Übersicht-Tab
-- [ ] Flutter: System-Tab
+- [ ] Flutter: Übersicht-Tab mit Health Score + grafischer Übersicht
+- [ ] Flutter: System-Tab mit VM-Grid + Service-Matrix
 - [ ] Flutter: Code-Quality-Tab
 - [ ] Flutter: Live-Health-Indikatoren
+- [ ] Flutter: Push-Benachrichtigungen (Polling + workmanager)
 - [ ] Deployment: APK + Flatpak
 
 ## Was NICHT hier rein gehört
 
-- Mission Control Dashboard → bleibt in `~/mission-control/` (Streamlit)
-- Discord-Berichte → bleiben als Fallback
+- Streamlit Mission Control → archiviert in `~/mission-control_old/` (wird nach Migration gelöscht)
+- Discord-Berichte → werden später stillgelegt
 - Trading-Analysen → bleiben in `~/trading-app/`
-- Token-Verbrauch → bleibt in Streamlit
+- API-Kosten/Token-Tracking → nicht lokal trackbar (OpenCode Go)
 - CronMaster → bleibt auf LXC 102

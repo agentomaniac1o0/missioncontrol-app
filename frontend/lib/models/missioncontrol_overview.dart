@@ -1,0 +1,45 @@
+class MissioncontrolOverview {
+  final String status;
+  final DateTime lastReport;
+  final int healthScore;
+  final Map<String, double> diskUsage;
+  final String crewStatus;
+  final List<String> activeAlerts;
+
+  const MissioncontrolOverview({
+    required this.status,
+    required this.lastReport,
+    required this.healthScore,
+    required this.diskUsage,
+    required this.crewStatus,
+    required this.activeAlerts,
+  });
+
+  factory MissioncontrolOverview.fromJson(Map<String, dynamic> json) {
+    return MissioncontrolOverview(
+      status: json['status'] as String? ?? 'unknown',
+      lastReport: DateTime.parse(json['last_report'] as String),
+      healthScore: json['health_score'] as int? ?? 0,
+      diskUsage: (json['disk_usage'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, (v as num).toDouble()),
+          ) ??
+          {},
+      crewStatus: json['crew_status'] as String? ?? 'unknown',
+      activeAlerts: (json['active_alerts'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+    );
+  }
+
+  factory MissioncontrolOverview.placeholder() {
+    return MissioncontrolOverview(
+      status: 'loading',
+      lastReport: DateTime.now(),
+      healthScore: 0,
+      diskUsage: {},
+      crewStatus: 'loading',
+      activeAlerts: [],
+    );
+  }
+}

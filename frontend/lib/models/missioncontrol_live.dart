@@ -1,0 +1,66 @@
+class MissioncontrolLive {
+  final List<LiveHeartbeat> heartbeats;
+  final List<LiveServiceCheck> serviceChecks;
+  final DateTime timestamp;
+
+  const MissioncontrolLive({
+    required this.heartbeats,
+    required this.serviceChecks,
+    required this.timestamp,
+  });
+
+  factory MissioncontrolLive.fromJson(Map<String, dynamic> json) {
+    return MissioncontrolLive(
+      heartbeats: (json['heartbeats'] as List<dynamic>?)
+              ?.map((e) => LiveHeartbeat.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      serviceChecks: (json['service_checks'] as List<dynamic>?)
+              ?.map(
+                  (e) => LiveServiceCheck.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      timestamp: json['timestamp'] != null
+          ? DateTime.parse(json['timestamp'] as String)
+          : DateTime.now(),
+    );
+  }
+
+  bool get hasCritical =>
+      heartbeats.any((h) => h.status == 'critical') ||
+      serviceChecks.any((s) => !s.online);
+}
+
+class LiveHeartbeat {
+  final String system;
+  final String status;
+
+  const LiveHeartbeat({required this.system, required this.status});
+
+  factory LiveHeartbeat.fromJson(Map<String, dynamic> json) {
+    return LiveHeartbeat(
+      system: json['system'] as String,
+      status: json['status'] as String? ?? 'unknown',
+    );
+  }
+}
+
+class LiveServiceCheck {
+  final String service;
+  final bool online;
+  final int responseTimeMs;
+
+  const LiveServiceCheck({
+    required this.service,
+    required this.online,
+    required this.responseTimeMs,
+  });
+
+  factory LiveServiceCheck.fromJson(Map<String, dynamic> json) {
+    return LiveServiceCheck(
+      service: json['service'] as String,
+      online: json['online'] as bool? ?? false,
+      responseTimeMs: json['response_time_ms'] as int? ?? 0,
+    );
+  }
+}

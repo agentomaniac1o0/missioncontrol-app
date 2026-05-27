@@ -1,16 +1,35 @@
+# macOS
 .DS_Store
+
+# Logs
 *.log
+
+# Python
 *.pyc
 __pycache__/
 .venv/
+
+# Node (falls mal nötig)
 node_modules/
+
+# Flutter / Dart
 .pub-cache/
+.dart_tool/
 build/
-.flatpak-builder/
-repo/
-.env
-*.swp
-*.swo
+*.iml
 .idea/
 .vscode/
-*.iml
+*.swp
+*.swo
+
+# Flatpak
+.flatpak-builder/
+repo/
+
+# Secrets
+.env
+
+# Legacy
+*.pid
+*.ptx
+.travis.yml

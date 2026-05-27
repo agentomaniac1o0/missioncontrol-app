@@ -1,0 +1,224 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../config/theme.dart';
+import '../providers/missioncontrol_provider.dart';
+import '../widgets/health_dot.dart';
+import '../widgets/vm_card.dart';
+
+class SystemPage extends ConsumerWidget {
+  const SystemPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final location = ref.watch(locationProvider);
+    final systemAsync = ref.watch(missioncontrollerSystemProvider(location));
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(missioncontrollerSystemProvider(location));
+      },
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildHostSection(systemAsync),
+          const SizedBox(height: 12),
+          _buildVmSection(systemAsync),
+          const SizedBox(height: 12),
+          _buildServiceSection(systemAsync),
+          const SizedBox(height: 12),
+          _buildBackupSection(systemAsync),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHostSection(AsyncValue async) {
+    return async.when(
+      data: (system) {
+        final host = system.host;
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Proxmox Host',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(child: _gaugeChart('CPU', host.cpuPercent)),
+                    Expanded(child: _gaugeChart('RAM', host.ramPercent)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _infoRow('Uptime', host.uptime),
+                _infoRow('Kernel', host.kernelVersion),
+                _infoRow('Updates', host.updatesPending ? 'pending' : 'up-to-date'),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const Card(child: SizedBox(height: 160, child: Center(child: CircularProgressIndicator()))),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _gaugeChart(String label, double percent) {
+    final color = percent >= 90
+        ? AppTheme.red
+        : percent >= 70
+            ? AppTheme.gold
+            : AppTheme.green;
+    return Column(
+      children: [
+        SizedBox(
+          width: 80,
+          height: 80,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: CircularProgressIndicator(
+                  value: percent / 100,
+                  strokeWidth: 6,
+                  backgroundColor: AppTheme.surface,
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                ),
+              ),
+              Text(
+                '${percent.toStringAsFixed(0)}%',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 11, color: Colors.white54)),
+      ],
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          SizedBox(width: 60, child: Text(label, style: const TextStyle(fontSize: 11, color: Colors.white38))),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 12))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVmSection(AsyncValue async) {
+    return async.when(
+      data: (system) {
+        if (system.vms.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 4, bottom: 8),
+              child: Text('VMs & LXCs',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            ),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.6,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: system.vms.length,
+              itemBuilder: (_, i) => VmCard(vm: system.vms[i]),
+            ),
+          ],
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildServiceSection(AsyncValue async) {
+    return async.when(
+      data: (system) {
+        if (system.services.isEmpty) return const SizedBox.shrink();
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Services', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                ...system.services.map((s) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: Row(
+                        children: [
+                          HealthDot(status: s.online ? 'online' : 'offline', size: 8),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(s.name, style: const TextStyle(fontSize: 12))),
+                          Text(
+                            'Port ${s.port}',
+                            style: const TextStyle(fontSize: 10, color: Colors.white38),
+                          ),
+                        ],
+                      ),
+                    )),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildBackupSection(AsyncValue async) {
+    return async.when(
+      data: (system) {
+        if (system.backups.isEmpty) return const SizedBox.shrink();
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Backups', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                ...system.backups.map((b) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: Row(
+                        children: [
+                          Icon(
+                            b.success ? Icons.check_circle : Icons.error,
+                            size: 16,
+                            color: b.success ? AppTheme.green : AppTheme.red,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(b.vmName, style: const TextStyle(fontSize: 12))),
+                          Text(
+                            '${b.lastBackup.day}.${b.lastBackup.month}.',
+                            style: const TextStyle(fontSize: 10, color: Colors.white38),
+                          ),
+                        ],
+                      ),
+                    )),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}

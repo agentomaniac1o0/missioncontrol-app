@@ -1,0 +1,141 @@
+class VmStatus {
+  final String name;
+  final String status;
+  final double cpuPercent;
+  final double ramPercent;
+  final double diskPercent;
+  final int uptimeDays;
+
+  const VmStatus({
+    required this.name,
+    required this.status,
+    required this.cpuPercent,
+    required this.ramPercent,
+    required this.diskPercent,
+    required this.uptimeDays,
+  });
+
+  factory VmStatus.fromJson(Map<String, dynamic> json) {
+    return VmStatus(
+      name: json['name'] as String,
+      status: json['status'] as String? ?? 'unknown',
+      cpuPercent: (json['cpu_percent'] as num?)?.toDouble() ?? 0,
+      ramPercent: (json['ram_percent'] as num?)?.toDouble() ?? 0,
+      diskPercent: (json['disk_percent'] as num?)?.toDouble() ?? 0,
+      uptimeDays: json['uptime_days'] as int? ?? 0,
+    );
+  }
+}
+
+class ServiceStatus {
+  final String name;
+  final bool online;
+  final int port;
+
+  const ServiceStatus({
+    required this.name,
+    required this.online,
+    required this.port,
+  });
+
+  factory ServiceStatus.fromJson(Map<String, dynamic> json) {
+    return ServiceStatus(
+      name: json['name'] as String,
+      online: json['online'] as bool? ?? false,
+      port: json['port'] as int? ?? 0,
+    );
+  }
+}
+
+class ProxmoxHost {
+  final double cpuPercent;
+  final double ramPercent;
+  final String uptime;
+  final String kernelVersion;
+  final bool updatesPending;
+
+  const ProxmoxHost({
+    required this.cpuPercent,
+    required this.ramPercent,
+    required this.uptime,
+    required this.kernelVersion,
+    required this.updatesPending,
+  });
+
+  factory ProxmoxHost.fromJson(Map<String, dynamic> json) {
+    return ProxmoxHost(
+      cpuPercent: (json['cpu_percent'] as num?)?.toDouble() ?? 0,
+      ramPercent: (json['ram_percent'] as num?)?.toDouble() ?? 0,
+      uptime: json['uptime'] as String? ?? '',
+      kernelVersion: json['kernel_version'] as String? ?? '',
+      updatesPending: json['updates_pending'] as bool? ?? false,
+    );
+  }
+}
+
+class BackupStatus {
+  final String vmName;
+  final DateTime lastBackup;
+  final bool success;
+
+  const BackupStatus({
+    required this.vmName,
+    required this.lastBackup,
+    required this.success,
+  });
+
+  factory BackupStatus.fromJson(Map<String, dynamic> json) {
+    return BackupStatus(
+      vmName: json['vm_name'] as String,
+      lastBackup: DateTime.parse(json['last_backup'] as String),
+      success: json['success'] as bool? ?? false,
+    );
+  }
+}
+
+class MissioncontrolSystem {
+  final ProxmoxHost host;
+  final List<VmStatus> vms;
+  final List<ServiceStatus> services;
+  final List<BackupStatus> backups;
+
+  const MissioncontrolSystem({
+    required this.host,
+    required this.vms,
+    required this.services,
+    required this.backups,
+  });
+
+  factory MissioncontrolSystem.fromJson(Map<String, dynamic> json) {
+    return MissioncontrolSystem(
+      host: ProxmoxHost.fromJson(json['host'] as Map<String, dynamic>? ?? {}),
+      vms: (json['vms'] as List<dynamic>?)
+              ?.map((e) => VmStatus.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      services: (json['services'] as List<dynamic>?)
+              ?.map((e) => ServiceStatus.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      backups: (json['backups'] as List<dynamic>?)
+              ?.map((e) => BackupStatus.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+  }
+
+  factory MissioncontrolSystem.placeholder() {
+    return const MissioncontrolSystem(
+      host: ProxmoxHost(
+        cpuPercent: 0,
+        ramPercent: 0,
+        uptime: '',
+        kernelVersion: '',
+        updatesPending: false,
+      ),
+      vms: [],
+      services: [],
+      backups: [],
+    );
+  }
+}
