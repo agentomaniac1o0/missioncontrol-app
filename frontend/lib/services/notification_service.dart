@@ -36,6 +36,7 @@ Future<void> showCriticalNotification(String title, String body) async {
 class HealthCheckPoller {
   final Dio _dio;
   Timer? _timer;
+  String _lastIssueKey = '';
 
   HealthCheckPoller(this._dio);
 
@@ -56,7 +57,13 @@ class HealthCheckPoller {
     try {
       final issues = await checkOnce(location);
       if (issues.isNotEmpty) {
-        await showCriticalNotification('Mission Control Alert', issues.join('\n'));
+        final key = issues.join('|');
+        if (key != _lastIssueKey) {
+          _lastIssueKey = key;
+          await showCriticalNotification('Mission Control Alert', issues.join('\n'));
+        }
+      } else {
+        _lastIssueKey = '';
       }
     } catch (_) {}
   }
