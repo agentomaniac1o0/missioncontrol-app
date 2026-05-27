@@ -47,6 +47,10 @@ do_frontend() {
     flatpak-builder --repo=repo --force-clean --install --user build-dir \
         app.missioncontrol.MissionControlApp.yml
 
+    echo "→ link desktop entry..."
+    mkdir -p $HOME/.local/share/applications
+    ln -sf $HOME/.local/share/flatpak/exports/share/applications/app.missioncontrol.MissionControlApp.desktop $HOME/.local/share/applications/
+
     echo ""
     echo -e "${GREEN}✓ App bereit:${RESET} flatpak run app.missioncontrol.MissionControlApp"
     echo -e "  Commit: $(git -C "$MISSION_DIR" rev-parse --short HEAD)"
