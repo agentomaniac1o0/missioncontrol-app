@@ -64,3 +64,37 @@ class LiveServiceCheck {
     );
   }
 }
+
+class LiveCriticalCount {
+  final int heartbeatCritical;
+  final int servicesOffline;
+  final int total;
+
+  const LiveCriticalCount({
+    required this.heartbeatCritical,
+    required this.servicesOffline,
+    required this.total,
+  });
+
+  factory LiveCriticalCount.fromJson(Map<String, dynamic> json) {
+    return LiveCriticalCount(
+      heartbeatCritical: json['heartbeat_critical'] as int? ?? 0,
+      servicesOffline: json['services_offline'] as int? ?? 0,
+      total: json['total'] as int? ?? 0,
+    );
+  }
+}
+
+class HealthTrendPoint {
+  final String date;
+  final int score;
+
+  const HealthTrendPoint({required this.date, required this.score});
+
+  factory HealthTrendPoint.fromJson(Map<String, dynamic> json) {
+    return HealthTrendPoint(
+      date: json['date'] as String? ?? '',
+      score: json['score'] as int? ?? 0,
+    );
+  }
+}

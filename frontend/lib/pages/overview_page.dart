@@ -1,6 +1,9 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../config/theme.dart';
 import '../models/missioncontrol_health.dart';
+import '../models/missioncontrol_live.dart';
 import '../models/missioncontrol_overview.dart';
 import '../providers/live_provider.dart';
 import '../providers/missioncontrol_provider.dart';
@@ -32,6 +35,8 @@ class OverviewPage extends ConsumerWidget {
         children: [
           _buildHealthScore(healthAsync),
           const SizedBox(height: 12),
+          _buildHealthTrend(ref, location),
+          const SizedBox(height: 12),
           _buildStatusStrip(overviewAsync),
           const SizedBox(height: 14),
           SectionHeader(title: 'Disk Usage', frequency: RefreshFrequency.daily, subtitle: 'aus Report'),
@@ -53,6 +58,74 @@ class OverviewPage extends ConsumerWidget {
     return healthAsync.when(
       data: (health) => HealthScoreCard(health: health),
       loading: () => const HealthScoreCard(health: null),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildHealthTrend(WidgetRef ref, String location) {
+    final trendAsync = ref.watch(healthTrendProvider(location));
+    return trendAsync.when(
+      data: (points) {
+        if (points.length < 2) return const SizedBox.shrink();
+        final maxY = points.map((p) => p.score.toDouble()).reduce((a, b) => a > b ? a : b);
+        final minY = points.map((p) => p.score.toDouble()).reduce((a, b) => a < b ? a : b);
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 12, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: Text('Health Trend', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white54)),
+                ),
+                const SizedBox(height: 4),
+                SizedBox(
+                  height: 100,
+                  child: LineChart(
+                    LineChartData(
+                      minY: (minY - 5).clamp(0, 100).toDouble(),
+                      maxY: (maxY + 5).clamp(0, 100).toDouble(),
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: false,
+                        getDrawingHorizontalLine: (v) => FlLine(color: Colors.white10, strokeWidth: 0.5),
+                      ),
+                      titlesData: FlTitlesData(
+                        bottomTitles: AxisTitles(sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 20,
+                          interval: 3,
+                          getTitlesWidget: (v, _) {
+                            final i = v.toInt();
+                            if (i < 0 || i >= points.length) return const SizedBox.shrink();
+                            return Text(points[i].date.substring(5), style: const TextStyle(fontSize: 8, color: Colors.white24));
+                          },
+                        )),
+                        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      ),
+                      borderData: FlBorderData(show: false),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: points.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value.score.toDouble())).toList(),
+                          isCurved: true,
+                          color: AppTheme.green,
+                          barWidth: 2,
+                          dotData: FlDotData(show: true, getDotPainter: (spot, _, __, ___) => FlDotCirclePainter(radius: 2, color: AppTheme.green, strokeWidth: 0)),
+                          belowBarData: BarAreaData(show: true, color: AppTheme.green.withValues(alpha: 0.08)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
     );
   }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:dio/dio.dart';
 import '../config/api_config.dart';
-import '../config/theme.dart';
 
 final _notifications = FlutterLocalNotificationsPlugin();
 
@@ -19,16 +18,19 @@ Future<void> initNotifications() async {
 }
 
 Future<void> showCriticalNotification(String title, String body) async {
-  const androidDetails = AndroidNotificationDetails(
-    'missioncontrol_critical',
-    'Critical Alerts',
-    channelDescription: 'Health check failures and critical issues',
-    importance: Importance.high,
-    priority: Priority.high,
-    color: AppTheme.red,
-  );
-  const details = NotificationDetails(android: androidDetails);
-  await _notifications.show(0, title, body, details);
+  try {
+    const androidDetails = AndroidNotificationDetails(
+      'missioncontrol_critical',
+      'Critical Alerts',
+      channelDescription: 'Health check failures and critical issues',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    await _notifications.show(
+      0, title, body,
+      const NotificationDetails(android: androidDetails),
+    );
+  } catch (_) {}
 }
 
 class HealthCheckPoller {

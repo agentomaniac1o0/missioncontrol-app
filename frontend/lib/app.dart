@@ -10,6 +10,7 @@ import 'pages/reports_page.dart';
 import 'providers/missioncontrol_provider.dart';
 import 'providers/live_provider.dart';
 import 'providers/graphiphy_provider.dart';
+import 'widgets/refresh_badge.dart';
 
 class MissionControlApp extends ConsumerWidget {
   const MissionControlApp({super.key});
@@ -17,6 +18,36 @@ class MissionControlApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final location = ref.watch(locationProvider);
+    final criticalAsync = ref.watch(criticalCountProvider(location));
+    final criticalCount = criticalAsync.valueOrNull?.total ?? 0;
+
+    final tabs = <Widget>[
+      const Tab(text: 'Ubersicht'),
+      const Tab(text: 'System'),
+      const Tab(text: 'Code Quality'),
+      const Tab(text: 'Graphiphy'),
+      Tab(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Live'),
+            if (criticalCount > 0) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                decoration: BoxDecoration(
+                  color: AppTheme.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('$criticalCount',
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ],
+        ),
+      ),
+      const Tab(text: 'Berichte'),
+    ];
 
     return MaterialApp(
       title: 'Mission Control',
@@ -37,15 +68,8 @@ class MissionControlApp extends ConsumerWidget {
                 ),
               ],
             ),
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'Ubersicht'),
-                Tab(text: 'System'),
-                Tab(text: 'Code Quality'),
-                Tab(text: 'Graphiphy'),
-                Tab(text: 'Live'),
-                Tab(text: 'Berichte'),
-              ],
+            bottom: TabBar(
+              tabs: tabs,
               isScrollable: true,
             ),
             actions: [
