@@ -368,3 +368,19 @@ cd ~/trading-app && git pull && systemctl --user restart trading-backend
 - Trading-Analysen → bleiben in `~/trading-app/`
 - API-Kosten/Token-Tracking → nicht lokal trackbar (OpenCode Go)
 - CronMaster → bleibt auf LXC 102
+
+## Session-Log: 2026-05-28 – Netzwerk-Security & Konnektivität
+
+### Tailscale-IP als einzige Backend-Verbindung
+- **API-Base-URL:** `http://100.103.32.107:8000` (via `--dart-define=API_BASE_URL=...` beim Build)
+- **Warum kein localhost:** Der FastAPI-Backend bindet nur an die Tailscale-IP (`100.103.32.107`), nicht an `127.0.0.1` oder `0.0.0.0`
+- **Backend-Erreichbarkeit:** Nur über Tailscale-Mesh — kein LAN/WAN-Zugriff
+- **Build-Hinweis:** `update.sh` setzt `API_BASE_URL` automatisch auf Tailscale-IP, es sei denn per Env überschrieben
+- **Health-Check:** `update.sh:85` → `ssh $SERVER_SSH "curl -sf $API_URL/api/health"`
+- **SSH-Ziel:** `100.103.32.107` (ai-agents VM 101)
+
+### Abhängigkeiten zum trading-app Backend
+- Mission Control App hat **kein eigenes Backend** — alle API-Calls gehen an `trading-app/backend`
+- Neue Router (`/api/missioncontrol/`) sind im trading-app-Backend integriert
+- Portfolio-Review, Production-Center, Health-Checks — alles über den gleichen Port 8000
+- **Kritisch:** Wenn der Backend nicht erreichbar ist (falscher Bind, Port-Problem), ist die gesamte App funktionslos

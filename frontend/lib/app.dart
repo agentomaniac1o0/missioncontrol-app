@@ -20,6 +20,7 @@ class MissionControlApp extends ConsumerWidget {
     final location = ref.watch(locationProvider);
     final criticalAsync = ref.watch(criticalCountProvider(location));
     final criticalCount = criticalAsync.valueOrNull?.total ?? 0;
+    final scale = ref.watch(textScaleProvider);
 
     final tabs = <Widget>[
       const Tab(text: 'Ubersicht'),
@@ -74,6 +75,32 @@ class MissionControlApp extends ConsumerWidget {
             ),
             actions: [
               IconButton(
+                icon: const Icon(Icons.zoom_out, size: 20),
+                tooltip: 'Verkleinern',
+                onPressed: scale > 0.6
+                    ? () => ref.read(textScaleProvider.notifier).state =
+                        (scale - 0.1).clamp(0.5, 2.5)
+                    : null,
+              ),
+              GestureDetector(
+                onTap: () => ref.read(textScaleProvider.notifier).state = 1.0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text('${(scale * 100).round()}%',
+                      style: TextStyle(fontSize: 11,
+                          color: scale == 1.0 ? Colors.white38 : AppTheme.gold)),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.zoom_in, size: 20),
+                tooltip: 'Vergrößern',
+                onPressed: scale < 2.4
+                    ? () => ref.read(textScaleProvider.notifier).state =
+                        (scale + 0.1).clamp(0.5, 2.5)
+                    : null,
+              ),
+              const SizedBox(width: 4),
+              IconButton(
                 icon: const Icon(Icons.refresh, size: 20),
                 tooltip: 'Daten aktualisieren',
                 onPressed: () {
@@ -94,15 +121,18 @@ class MissionControlApp extends ConsumerWidget {
               const SizedBox(width: 8),
             ],
           ),
-          body: const TabBarView(
-            children: [
-              OverviewPage(),
-              SystemPage(),
-              CodeQualityPage(),
-              GraphiphyPage(),
-              LivePage(),
-              ReportsPage(),
-            ],
+          body: MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
+            child: const TabBarView(
+              children: [
+                OverviewPage(),
+                SystemPage(),
+                CodeQualityPage(),
+                GraphiphyPage(),
+                LivePage(),
+                ReportsPage(),
+              ],
+            ),
           ),
         ),
       ),

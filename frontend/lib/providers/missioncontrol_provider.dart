@@ -9,6 +9,8 @@ final dioProvider = Provider<Dio>((ref) => Dio());
 
 final locationProvider = StateProvider<String>((ref) => 'home-lab');
 
+final textScaleProvider = StateProvider<double>((ref) => 1.0);
+
 final missioncontrollerOverviewProvider =
     FutureProvider.family<MissioncontrolOverview, String>((ref, location) async {
   final dio = ref.watch(dioProvider);

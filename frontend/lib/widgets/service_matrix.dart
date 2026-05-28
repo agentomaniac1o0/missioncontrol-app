@@ -30,6 +30,7 @@ class ServiceMatrix extends StatelessWidget {
 
   Widget _serviceChip(ServiceStatus service) {
     final color = service.online ? AppTheme.green : AppTheme.red;
+    final hostLabel = service.host.isNotEmpty ? '\n${service.host}' : '';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -47,7 +48,7 @@ class ServiceMatrix extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            service.name,
+            service.name + hostLabel,
             style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w500),
           ),
         ],

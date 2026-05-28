@@ -209,7 +209,7 @@ class _MarkdownRenderer extends StatelessWidget {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Text(line,
-                style: const TextStyle(fontSize: 10, color: Colors.white54, fontFamily: 'monospace')),
+                style: const TextStyle(fontSize: 12, color: Colors.white54, fontFamily: 'monospace')),
           );
         }
         if (line.startsWith('**') && line.contains(':**')) {
@@ -223,12 +223,12 @@ class _MarkdownRenderer extends StatelessWidget {
               children: [
                 Text('$label: ',
                     style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.white54)),
                 Expanded(
                     child: Text(value.trim(),
-                        style: const TextStyle(fontSize: 11))),
+                        style: const TextStyle(fontSize: 12))),
               ],
             ),
           );
@@ -239,7 +239,7 @@ class _MarkdownRenderer extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 1),
           child: Text(line,
-              style: const TextStyle(fontSize: 11, color: Colors.white70)),
+              style: const TextStyle(fontSize: 12, color: Colors.white70)),
         );
       }).toList(),
     );
@@ -269,7 +269,7 @@ class _JsonRenderer extends StatelessWidget {
       child: SelectableText(
         formatted,
         style: const TextStyle(
-            fontSize: 11, color: Colors.white70, fontFamily: 'monospace'),
+            fontSize: 12, color: Colors.white70, fontFamily: 'monospace'),
       ),
     );
   }

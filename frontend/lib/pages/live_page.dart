@@ -214,10 +214,12 @@ class _LivePageState extends ConsumerState<LivePage> {
           child: BarChart(
             BarChartData(
               alignment: BarChartAlignment.spaceAround,
-              maxY: onlineChecks
-                      .map((c) => c.responseTimeMs.toDouble())
-                      .reduce((a, b) => a > b ? a : b) *
-                  1.3,
+               maxY: (() {
+                      final raw = onlineChecks
+                          .map((c) => c.responseTimeMs.toDouble())
+                          .reduce((a, b) => a > b ? a : b);
+                      return (raw < 10 ? 10 : raw) * 1.3;
+                    })(),
               barGroups: onlineChecks.asMap().entries.map((e) {
                 final time = e.value.responseTimeMs.toDouble();
                 final color = time < 50

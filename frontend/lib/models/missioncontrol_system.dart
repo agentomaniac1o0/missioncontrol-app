@@ -31,11 +31,13 @@ class ServiceStatus {
   final String name;
   final bool online;
   final int port;
+  final String host;
 
   const ServiceStatus({
     required this.name,
     required this.online,
     required this.port,
+    this.host = '',
   });
 
   factory ServiceStatus.fromJson(Map<String, dynamic> json) {
@@ -43,6 +45,7 @@ class ServiceStatus {
       name: json['name'] as String,
       online: json['online'] as bool? ?? false,
       port: json['port'] as int? ?? 0,
+      host: json['host'] as String? ?? '',
     );
   }
 }
