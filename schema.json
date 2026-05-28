@@ -47,7 +47,8 @@ Diese Datei wird vom FastAPI Backend gelesen und über `/api/missioncontrol/{loc
     "VM 100": 6.0,
     "LXC 102": 28.0,
     "LXC 103": 47.0,
-    "LXC 104": 28.0
+    "LXC 104": 28.0,
+    "LXC 105": 11.0
   },
   "crew_status": "completed",
   "active_alerts": [
