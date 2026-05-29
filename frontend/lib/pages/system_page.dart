@@ -46,7 +46,7 @@ class SystemPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SectionHeader(title: 'Proxmox Host', frequency: RefreshFrequency.daily),
+                SectionHeader(title: 'Proxmox Host', frequency: RefreshFrequency.daily, lastReport: system.lastReport),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -119,7 +119,7 @@ class SystemPage extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily),
+            SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily, lastReport: system.lastReport),
             const SizedBox(height: 8),
             ...system.vms.map((vm) {
               final vmNum = RegExp(r'\d+').firstMatch(vm.name)?.group(0);
@@ -154,7 +154,7 @@ class SystemPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SectionHeader(title: 'Services', frequency: RefreshFrequency.daily),
+                SectionHeader(title: 'Services', frequency: RefreshFrequency.daily, lastReport: system.lastReport),
                 ...system.services.map((s) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
                       child: Row(
@@ -190,7 +190,7 @@ class SystemPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SectionHeader(title: 'Backups', frequency: RefreshFrequency.daily),
+                SectionHeader(title: 'Backups', frequency: RefreshFrequency.daily, lastReport: system.lastReport),
                 ...system.backups.map((b) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
                       child: Column(
@@ -239,7 +239,7 @@ class SystemPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SectionHeader(title: 'Updates & Wartung', frequency: RefreshFrequency.daily),
+                SectionHeader(title: 'Updates & Wartung', frequency: RefreshFrequency.daily, lastReport: system.lastReport),
                 const SizedBox(height: 8),
                 ...system.updates.map((u) => _updateRow(u)),
               ],

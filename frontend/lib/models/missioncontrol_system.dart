@@ -143,6 +143,7 @@ class MissioncontrolSystem {
   final List<ServiceStatus> services;
   final List<BackupStatus> backups;
   final List<SysUpdate> updates;
+  final String lastReport;
 
   const MissioncontrolSystem({
     required this.host,
@@ -150,6 +151,7 @@ class MissioncontrolSystem {
     required this.services,
     required this.backups,
     required this.updates,
+    this.lastReport = '',
   });
 
   factory MissioncontrolSystem.fromJson(Map<String, dynamic> json) {
@@ -171,6 +173,7 @@ class MissioncontrolSystem {
               ?.map((e) => SysUpdate.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      lastReport: json['last_report'] as String? ?? '',
     );
   }
 

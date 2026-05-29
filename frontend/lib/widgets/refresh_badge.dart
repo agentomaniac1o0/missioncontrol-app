@@ -45,16 +45,32 @@ class RefreshBadge extends StatelessWidget {
   }
 }
 
+String _formatReportTime(String iso) {
+  if (iso.isEmpty) return '';
+  try {
+    final dt = DateTime.parse(iso).toLocal();
+    final day = dt.day.toString().padLeft(2, '0');
+    final month = dt.month.toString().padLeft(2, '0');
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '$day.$month. $hour:$minute';
+  } catch (_) {
+    return '';
+  }
+}
+
 class SectionHeader extends StatelessWidget {
   final String title;
   final RefreshFrequency frequency;
   final String? subtitle;
+  final String? lastReport;
 
   const SectionHeader({
     super.key,
     required this.title,
     this.frequency = RefreshFrequency.daily,
     this.subtitle,
+    this.lastReport,
   });
 
   @override
@@ -64,13 +80,23 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                if (lastReport != null && lastReport!.isNotEmpty)
+                  Text(
+                    _formatReportTime(lastReport!),
+                    style: TextStyle(fontSize: 9, color: Colors.white24),
+                  ),
+              ],
+            ),
           ),
           if (subtitle != null) ...[
             Text(subtitle!, style: TextStyle(fontSize: 10, color: Colors.white24)),
             const SizedBox(width: 6),
           ],
-          RefreshBadge(frequency: frequency),
+          RefreshBadge(frequency: frequency, customLabel: lastReport != null && lastReport!.isNotEmpty ? _formatReportTime(lastReport!) : null),
         ],
       ),
     );

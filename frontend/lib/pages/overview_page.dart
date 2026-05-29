@@ -38,15 +38,11 @@ class OverviewPage extends ConsumerWidget {
           _buildHealthTrend(ref, location),
           const SizedBox(height: 12),
           _buildStatusStrip(overviewAsync),
+          _buildDiskSection(overviewAsync),
           const SizedBox(height: 14),
-          SectionHeader(title: 'Disk Usage', frequency: RefreshFrequency.daily, subtitle: 'aus Report'),
-          _buildDiskOverview(overviewAsync),
+          _buildVmSectionOverview(overviewAsync, systemAsync),
           const SizedBox(height: 14),
-          SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily, subtitle: 'aus Report'),
-          _buildVmGrid(systemAsync),
-          const SizedBox(height: 14),
-          SectionHeader(title: 'Services', frequency: RefreshFrequency.daily, subtitle: 'aus Report'),
-          _buildServiceMatrix(systemAsync),
+          _buildServiceSectionOverview(overviewAsync, systemAsync),
           const SizedBox(height: 14),
           _buildAlerts(overviewAsync),
         ],
@@ -152,22 +148,28 @@ class OverviewPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildDiskOverview(AsyncValue<MissioncontrolOverview> async) {
+  Widget _buildDiskSection(AsyncValue<MissioncontrolOverview> async) {
     return async.when(
       data: (overview) {
         if (overview.diskUsage.isEmpty) return const SizedBox.shrink();
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...overview.diskUsage.entries.map(
-                  (e) => DiskBar(label: e.key, percent: e.value),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(title: 'Disk Usage', frequency: RefreshFrequency.daily, subtitle: 'aus Report', lastReport: _fmtIso(overview.lastReport)),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...overview.diskUsage.entries.map(
+                      (e) => DiskBar(label: e.key, percent: e.value),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         );
       },
       loading: () => const SizedBox.shrink(),
@@ -175,21 +177,28 @@ class OverviewPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildVmGrid(AsyncValue async) {
-    return async.when(
+  Widget _buildVmSectionOverview(AsyncValue<MissioncontrolOverview> overviewAsync, AsyncValue systemAsync) {
+    final overview = overviewAsync.asData?.value;
+    return systemAsync.when(
       data: (system) {
         if (system.vms.isEmpty) return const SizedBox.shrink();
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1.3,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-          ),
-          itemCount: system.vms.length,
-          itemBuilder: (_, i) => VmRingCard(vm: system.vms[i]),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(title: 'VMs & LXCs', frequency: RefreshFrequency.daily, subtitle: 'aus Report', lastReport: overview != null ? _fmtIso(overview.lastReport) : null),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: system.vms.length,
+              itemBuilder: (_, i) => VmRingCard(vm: system.vms[i]),
+            ),
+          ],
         );
       },
       loading: () => const SizedBox.shrink(),
@@ -197,15 +206,26 @@ class OverviewPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildServiceMatrix(AsyncValue async) {
-    return async.when(
+  Widget _buildServiceSectionOverview(AsyncValue<MissioncontrolOverview> overviewAsync, AsyncValue systemAsync) {
+    final overview = overviewAsync.asData?.value;
+    return systemAsync.when(
       data: (system) {
         if (system.services.isEmpty) return const SizedBox.shrink();
-        return ServiceMatrix(services: system.services);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(title: 'Services', frequency: RefreshFrequency.daily, subtitle: 'aus Report', lastReport: overview != null ? _fmtIso(overview.lastReport) : null),
+            ServiceMatrix(services: system.services),
+          ],
+        );
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
     );
+  }
+
+  String _fmtIso(DateTime dt) {
+    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}T${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:00';
   }
 
   Widget _buildAlerts(AsyncValue<MissioncontrolOverview> async) {
@@ -222,6 +242,7 @@ class OverviewPage extends ConsumerWidget {
                   title: 'Aktive Alerts',
                   frequency: RefreshFrequency.daily,
                   subtitle: 'aus Report',
+                  lastReport: _fmtIso(overview.lastReport),
                 ),
                 ...overview.activeAlerts.map((a) => Padding(
                       padding: const EdgeInsets.only(bottom: 4),
