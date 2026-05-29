@@ -84,11 +84,6 @@ class SectionHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                if (lastReport != null && lastReport!.isNotEmpty)
-                  Text(
-                    _formatReportTime(lastReport!),
-                    style: TextStyle(fontSize: 9, color: Colors.white24),
-                  ),
               ],
             ),
           ),
@@ -96,7 +91,14 @@ class SectionHeader extends StatelessWidget {
             Text(subtitle!, style: TextStyle(fontSize: 10, color: Colors.white24)),
             const SizedBox(width: 6),
           ],
-          RefreshBadge(frequency: frequency, customLabel: lastReport != null && lastReport!.isNotEmpty ? _formatReportTime(lastReport!) : null),
+          RefreshBadge(frequency: frequency),
+          if (lastReport != null && lastReport!.isNotEmpty) ...[
+            const SizedBox(width: 6),
+            Text(
+              _formatReportTime(lastReport!),
+              style: TextStyle(fontSize: 9, color: Colors.white38),
+            ),
+          ],
         ],
       ),
     );
