@@ -47,6 +47,7 @@ class MissioncontrolCodeQuality {
   final int hardcodedSecrets;
   final int bareExcepts;
   final List<String> autoFixResults;
+  final String lastReport;
 
   const MissioncontrolCodeQuality({
     required this.findings,
@@ -54,6 +55,7 @@ class MissioncontrolCodeQuality {
     required this.hardcodedSecrets,
     required this.bareExcepts,
     required this.autoFixResults,
+    this.lastReport = '',
   });
 
   factory MissioncontrolCodeQuality.fromJson(Map<String, dynamic> json) {
@@ -72,6 +74,7 @@ class MissioncontrolCodeQuality {
               ?.map((e) => e as String)
               .toList() ??
           [],
+      lastReport: json['last_report'] as String? ?? '',
     );
   }
 

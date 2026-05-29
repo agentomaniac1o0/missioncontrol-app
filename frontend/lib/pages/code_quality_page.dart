@@ -21,7 +21,7 @@ class CodeQualityPage extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          SectionHeader(title: 'Sicherheits-Statistik', frequency: RefreshFrequency.daily),
+          SectionHeader(title: 'Sicherheits-Statistik', frequency: RefreshFrequency.daily, lastReport: codeQualityAsync.asData?.value.lastReport),
           _buildSummaryCards(codeQualityAsync),
           const SizedBox(height: 14),
           _buildFindings(codeQualityAsync),
@@ -96,6 +96,7 @@ class CodeQualityPage extends ConsumerWidget {
               title: 'Audit Findings',
               frequency: RefreshFrequency.daily,
               subtitle: '${cq.findings.length} total',
+              lastReport: cq.lastReport,
             ),
             ...cq.findings.map((f) => FindingCard(finding: f)),
           ],
@@ -116,7 +117,7 @@ class CodeQualityPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SectionHeader(title: 'Offene Ports', frequency: RefreshFrequency.daily),
+                SectionHeader(title: 'Offene Ports', frequency: RefreshFrequency.daily, lastReport: cq.lastReport),
                 ...cq.openPorts.map((p) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
                       child: Row(
