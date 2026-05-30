@@ -2,11 +2,13 @@ class ReportListItem {
   final String filename;
   final String date;
   final int sizeBytes;
+  final String title;
 
   const ReportListItem({
     required this.filename,
     required this.date,
     required this.sizeBytes,
+    this.title = '',
   });
 
   factory ReportListItem.fromJson(Map<String, dynamic> json) {
@@ -14,6 +16,7 @@ class ReportListItem {
       filename: json['filename'] as String? ?? '',
       date: json['date'] as String? ?? '',
       sizeBytes: json['size_bytes'] as int? ?? 0,
+      title: json['title'] as String? ?? '',
     );
   }
 

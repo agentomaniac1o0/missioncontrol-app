@@ -87,7 +87,7 @@ class _ReportTile extends ConsumerWidget {
       child: ListTile(
         leading: Icon(Icons.article_outlined,
             size: 28, color: AppTheme.gold.withValues(alpha: 0.6)),
-        title: Text(report.filename,
+        title: Text(report.title.isNotEmpty ? report.title : report.filename,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         subtitle: Row(
           children: [
