@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:dio/dio.dart';
 import '../config/api_config.dart';
@@ -14,7 +15,9 @@ Future<void> initNotifications() async {
       linux: linuxSettings,
     );
     await _notifications.initialize(initSettings);
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('Notification init failed: $e');
+  }
 }
 
 Future<void> showCriticalNotification(String title, String body) async {
@@ -30,7 +33,9 @@ Future<void> showCriticalNotification(String title, String body) async {
       0, title, body,
       const NotificationDetails(android: androidDetails),
     );
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('Notification show failed: $e');
+  }
 }
 
 class HealthCheckPoller {
@@ -65,7 +70,9 @@ class HealthCheckPoller {
       } else {
         _lastIssueKey = '';
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Health check failed: $e');
+    }
   }
 
   Future<List<String>> checkOnce(String location) async {
@@ -86,7 +93,9 @@ class HealthCheckPoller {
       if (score < 50) issues.add('Health Score: $score');
       if (criticalSystems.isNotEmpty) issues.add('Offline: ${criticalSystems.join(', ')}');
       if (offlineServices.isNotEmpty) issues.add('Services down: ${offlineServices.join(', ')}');
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Health check API call failed: $e');
+    }
     return issues;
   }
 }

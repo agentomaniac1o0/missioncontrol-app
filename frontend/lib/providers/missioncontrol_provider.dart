@@ -1,11 +1,24 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/api_config.dart';
 import '../models/missioncontrol_overview.dart';
 import '../models/missioncontrol_system.dart';
 import '../models/missioncontrol_code_quality.dart';
 
-final dioProvider = Provider<Dio>((ref) => Dio());
+final dioProvider = Provider<Dio>((ref) {
+  final dio = Dio();
+  final apiKey = const String.fromEnvironment('API_KEY');
+  if (apiKey.isNotEmpty) {
+    dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        options.headers['X-API-Key'] = apiKey;
+        return handler.next(options);
+      },
+    ));
+  }
+  return dio;
+});
 
 final locationProvider = StateProvider<String>((ref) => 'home-lab');
 

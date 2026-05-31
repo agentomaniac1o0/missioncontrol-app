@@ -1,6 +1,6 @@
 const String apiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://100.103.32.107:8000',
+  defaultValue: '',
 );
 
 class ApiConfig {
@@ -42,5 +42,5 @@ class ApiConfig {
   static String reportsUrl(String location) =>
       '$baseUrl$missioncontrolPath/$location/reports';
   static String reportDetailUrl(String location, String filename) =>
-      '$baseUrl$missioncontrolPath/$location/reports/$filename';
+      '$baseUrl$missioncontrolPath/$location/reports/${Uri.encodeComponent(filename)}';
 }

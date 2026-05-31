@@ -17,6 +17,7 @@ API_URL="${API_BASE_URL:-http://100.103.32.107:8000}"
 MISSION_DIR="${MISSION_DIR:-$HOME/missioncontrol-app}"
 TRADING_DIR="${TRADING_DIR:-$HOME/trading-app}"
 SERVER_SSH="${SERVER_SSH:-100.103.32.107}"
+API_KEY="${API_KEY:-}"
 
 action="${1:-frontend}"
 
@@ -35,7 +36,11 @@ do_frontend() {
 
     cd frontend
     echo "→ flutter build linux..."
-    flutter build linux --release --dart-define="API_BASE_URL=$API_URL"
+    DART_DEFINES="--dart-define=API_BASE_URL=$API_URL"
+    if [ -n "$API_KEY" ]; then
+        DART_DEFINES="$DART_DEFINES --dart-define=API_KEY=$API_KEY"
+    fi
+    flutter build linux --release $DART_DEFINES
 
     echo "→ copy desktop integration..."
     cp "$MISSION_DIR/deploy/app.missioncontrol.MissionControlApp.desktop" "$MISSION_DIR/frontend/build/linux/x64/release/bundle/"
