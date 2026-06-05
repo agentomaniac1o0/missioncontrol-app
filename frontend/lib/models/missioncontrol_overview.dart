@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class MissioncontrolOverview {
   final String status;
   final DateTime lastReport;
@@ -19,7 +21,8 @@ class MissioncontrolOverview {
     DateTime parsedReport;
     try {
       parsedReport = DateTime.parse(json['last_report'] as String);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Overview timestamp parse failed: $e');
       parsedReport = DateTime.now();
     }
     return MissioncontrolOverview(
@@ -38,14 +41,4 @@ class MissioncontrolOverview {
     );
   }
 
-  factory MissioncontrolOverview.placeholder() {
-    return MissioncontrolOverview(
-      status: 'loading',
-      lastReport: DateTime.now(),
-      healthScore: 0,
-      diskUsage: {},
-      crewStatus: 'loading',
-      activeAlerts: [],
-    );
-  }
 }

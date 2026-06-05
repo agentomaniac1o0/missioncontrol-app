@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class VmStatus {
   final String name;
   final String status;
@@ -93,7 +95,8 @@ class BackupStatus {
     DateTime parsedBackup;
     try {
       parsedBackup = DateTime.parse(json['last_backup'] as String);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Backup timestamp parse failed: $e');
       parsedBackup = DateTime.now();
     }
     return BackupStatus(
@@ -177,19 +180,4 @@ class MissioncontrolSystem {
     );
   }
 
-  factory MissioncontrolSystem.placeholder() {
-    return const MissioncontrolSystem(
-      host: ProxmoxHost(
-        cpuPercent: 0,
-        ramPercent: 0,
-        uptime: '',
-        kernelVersion: '',
-        updatesPending: false,
-      ),
-      vms: [],
-      services: [],
-      backups: [],
-      updates: [],
-    );
-  }
 }

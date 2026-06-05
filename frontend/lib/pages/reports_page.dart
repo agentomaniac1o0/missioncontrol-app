@@ -256,7 +256,8 @@ class _JsonRenderer extends StatelessWidget {
     try {
       final decoded = json.decode(content);
       formatted = json.encode(decoded);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('JSON format failed: $e');
       formatted = content;
     }
     return Container(

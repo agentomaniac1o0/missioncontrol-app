@@ -78,13 +78,4 @@ class MissioncontrolCodeQuality {
     );
   }
 
-  factory MissioncontrolCodeQuality.placeholder() {
-    return const MissioncontrolCodeQuality(
-      findings: [],
-      openPorts: [],
-      hardcodedSecrets: 0,
-      bareExcepts: 0,
-      autoFixResults: [],
-    );
-  }
 }

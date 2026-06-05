@@ -10,7 +10,6 @@ import 'pages/reports_page.dart';
 import 'providers/missioncontrol_provider.dart';
 import 'providers/live_provider.dart';
 import 'providers/graphiphy_provider.dart';
-import 'widgets/refresh_badge.dart';
 
 class MissionControlApp extends ConsumerWidget {
   const MissionControlApp({super.key});

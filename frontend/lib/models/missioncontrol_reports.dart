@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class ReportListItem {
   final String filename;
   final String date;
@@ -24,7 +26,8 @@ class ReportListItem {
     try {
       final dt = DateTime.parse(date);
       return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Report date parse failed: $e');
       return date;
     }
   }
@@ -56,7 +59,8 @@ class ReportDetail {
     try {
       final dt = DateTime.parse(date);
       return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}  ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Report date parse failed: $e');
       return date;
     }
   }

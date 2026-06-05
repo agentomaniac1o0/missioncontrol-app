@@ -23,14 +23,6 @@ class GraphiphyStats {
     );
   }
 
-  factory GraphiphyStats.placeholder() {
-    return GraphiphyStats(
-      nodeCount: 0,
-      edgeCount: 0,
-      communityCount: 0,
-      fileTypes: {},
-    );
-  }
 }
 
 class GraphiphyGodNode {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 
@@ -54,7 +55,8 @@ String _formatReportTime(String iso) {
     final hour = dt.hour.toString().padLeft(2, '0');
     final minute = dt.minute.toString().padLeft(2, '0');
     return '$day.$month. $hour:$minute';
-  } catch (_) {
+  } catch (e) {
+    debugPrint('Report time format failed: $e');
     return '';
   }
 }

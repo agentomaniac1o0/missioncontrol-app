@@ -155,8 +155,12 @@ class _GraphiphyPageState extends ConsumerState<GraphiphyPage>
     );
   }
 
-  void _refreshGraph(String location) {
-    ref.read(graphiphyRefreshProvider(location));
+  Future<void> _refreshGraph(String location) async {
+    try {
+      await ref.read(graphiphyRefreshProvider(location).future);
+    } catch (e) {
+      debugPrint('Graph refresh failed: $e');
+    }
     Future.delayed(const Duration(seconds: 2), () {
       ref.invalidate(graphiphyPngUrlProvider(location));
       ref.invalidate(graphiphyRefreshProvider(location));
