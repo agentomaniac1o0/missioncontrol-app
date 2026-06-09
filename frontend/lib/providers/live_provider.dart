@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/api_config.dart';
 import '../models/missioncontrol_live.dart';
 import '../models/missioncontrol_health.dart';
+import '../models/missioncontrol_service_history.dart';
 import 'missioncontrol_provider.dart';
 
 final missioncontrollerLiveProvider =
@@ -31,4 +32,11 @@ final healthTrendProvider =
   final response = await dio.get(ApiConfig.healthTrendUrl(location));
   final list = response.data as List<dynamic>;
   return list.map((e) => HealthTrendPoint.fromJson(e as Map<String, dynamic>)).toList();
+});
+
+final serviceHistoryProvider =
+    FutureProvider.family<ServiceHistoryResponse, String>((ref, location) async {
+  final dio = ref.watch(dioProvider);
+  final response = await dio.get(ApiConfig.serviceHistoryUrl(location));
+  return ServiceHistoryResponse.fromJson(response.data as Map<String, dynamic>);
 });

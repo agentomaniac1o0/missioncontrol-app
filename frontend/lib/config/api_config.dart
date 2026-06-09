@@ -43,4 +43,6 @@ class ApiConfig {
       '$baseUrl$missioncontrolPath/$location/reports';
   static String reportDetailUrl(String location, String filename) =>
       '$baseUrl$missioncontrolPath/$location/reports/${Uri.encodeComponent(filename)}';
+  static String serviceHistoryUrl(String location) =>
+      '$baseUrl$missioncontrolPath/$location/services/history';
 }
