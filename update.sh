@@ -8,6 +8,11 @@
 
 set -e
 
+# Flutter PATH (CachyOS /opt/flutter default install)
+if [ -d /opt/flutter/bin ]; then
+    export PATH="/opt/flutter/bin:$PATH"
+fi
+
 BOLD="\033[1m"
 GREEN="\033[32m"
 YELLOW="\033[33m"
