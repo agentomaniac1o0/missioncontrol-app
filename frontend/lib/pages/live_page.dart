@@ -141,7 +141,8 @@ class _LivePageState extends ConsumerState<LivePage> {
 
     final maxTime = checks
         .map((c) => c.responseTimeMs.toDouble())
-        .reduce((a, b) => a > b ? a : b);
+        .where((t) => t > 0)
+        .fold(0.0, (a, b) => a > b ? a : b);
 
     return Card(
       child: Padding(
@@ -172,7 +173,9 @@ class _LivePageState extends ConsumerState<LivePage> {
                             Text(c.service,
                                 style: const TextStyle(fontSize: 12)),
                             Text(
-                              c.online ? '${c.responseTimeMs}ms' : 'offline',
+                               c.online
+                                   ? (c.responseTimeMs > 0 ? '${c.responseTimeMs}ms' : '—')
+                                   : 'offline',
                               style: TextStyle(
                                   fontSize: 11,
                                   color: color,
@@ -214,12 +217,13 @@ class _LivePageState extends ConsumerState<LivePage> {
           child: BarChart(
             BarChartData(
               alignment: BarChartAlignment.spaceAround,
-               maxY: (() {
-                      final raw = onlineChecks
-                          .map((c) => c.responseTimeMs.toDouble())
-                          .reduce((a, b) => a > b ? a : b);
-                      return (raw < 10 ? 10 : raw) * 1.3;
-                    })(),
+                maxY: (() {
+                       final raw = onlineChecks
+                           .map((c) => c.responseTimeMs.toDouble())
+                           .where((t) => t > 0)
+                           .fold(0.0, (a, b) => a > b ? a : b);
+                       return (raw < 10 ? 10 : raw) * 1.3;
+                     })(),
               barGroups: onlineChecks.asMap().entries.map((e) {
                 final time = e.value.responseTimeMs.toDouble();
                 final color = time < 50

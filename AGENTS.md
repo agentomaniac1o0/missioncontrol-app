@@ -8,6 +8,15 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 **Repo:** `~/missioncontrol-app/` (öffentlich auf GitHub)
 **Backend:** Bestehender FastAPI-Backend in `~/trading-app/backend/` wird erweitert
 
+## Code Conventions
+
+| Sprach | Skill | Wann laden |
+|--------|-------|------------|
+| Dart (Frontend) | `/flutter-conventions` | Riverpod, Widgets, State Management |
+| Python (Backend-Erw.) | `/python-conventions` | FastAPI-Router im trading-app Backend |
+| Beide | `/code-quality` | Nach jeder Code-Generierung |
+| Tests | `/testing-conventions` | flutter_test, pytest |
+
 ## Architektur
 
 ```

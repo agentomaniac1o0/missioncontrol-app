@@ -10,6 +10,17 @@ class AppTheme {
   static const Color surface = Color(0xFF161B22);
   static const Color cardSurface = Color(0xFF1C2333);
 
+  static const Color textSecondary = Color(0x89FFFFFF);
+  static const Color textMuted = Color(0x3DFFFFFF);
+  static const Color textHint = Color(0x61FFFFFF);
+  static const Color gridLine = Color(0x1AFFFFFF);
+
+  static const List<Color> chartColors = [
+    green, gold, blue, violet, red,
+    Color(0xFF1DE9B6), Color(0xFFFFAB40), Color(0xFF18FFFF),
+    Color(0xFFF48FB1),
+  ];
+
   static ThemeData get darkTheme => ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: dark,
