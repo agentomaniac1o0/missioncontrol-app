@@ -287,13 +287,18 @@ Das macht: `git pull` → `flutter build linux` → `flatpak-builder install`
 
 APK liegt in Nextcloud: `Home Lab/Mission Control/missioncontrol-*.apk`
 
-### Backend (Server: ai-agents VM 101)
+### Backend (Server: LXC 104 trading-app)
 
-Das Backend läuft in `~/trading-app/backend/`. Update via:
+Das Backend läuft auf **LXC 104** (Tailscale `100.112.199.58:8000`) — nicht mehr auf VM 101. Update via:
 
 ```bash
+# Update auf VM 101 pullen,
 ssh ai-agents
-cd ~/trading-app && git pull && systemctl --user restart trading-backend
+cd ~/trading-app && git pull
+# Auf LXC 104 deployen via LXC 104 root SSH:
+scp -i ~/.ssh/lxc104_monitor backend/app/routers/missioncontrol.py root@100.112.199.58:/home/trading/trading-app/backend/app/routers/
+# Service kicker:
+ssh -i ~/.ssh/lxc104_monitor root@100.112.199.58 "chown trading:trading /home/trading/trading-app/backend/app/routers/missioncontrol.py; su - trading -c 'export XDG_RUNTIME_DIR=/run/user/1000; export DBUS_SESSION_BUS_ADDRESS=unix:path=\$XDG_RUNTIME_DIR/bus; systemctl --user restart trading-backend.service'"
 ```
 
 ## Session-Log: 2026-05-27
@@ -393,3 +398,29 @@ cd ~/trading-app && git pull && systemctl --user restart trading-backend
 - Neue Router (`/api/missioncontrol/`) sind im trading-app-Backend integriert
 - Portfolio-Review, Production-Center, Health-Checks — alles über den gleichen Port 8000
 - **Kritisch:** Wenn der Backend nicht erreichbar ist (falscher Bind, Port-Problem), ist die gesamte App funktionslos
+
+## Session-Log: 2026-08-10 — Backend auf LXC 104 umgestellt
+
+### Context
+- Backend war bis 2026-07-23 auf VM 101 (`100.103.32.107:8000`). Umzug damals nur teildurchgeführt
+- Mission Control App zeigte keine Daten — hardcoded `API_BASE_URL=http://100.103.32.107:8000`ibalte Builds, und Backend auf LXC 104 fand die Reports nicht (Pfade `~/agent-templates/monitoring/` existierten dort nicht)
+
+### Fixes
+- **`agent-templates/monitoring/sync_to_lxc104.sh`** neu — rsync'd VM 101 `~/agent-templates/monitoring/` nach LXC 104 `~/trading-app/backend/data/monitoring/` täglich 08:30 (nach Monitoring-Crew). Heartbeat `sync_heartbeat.json`.
+- **`trading-app/backend/app/routers/missioncontrol.py`**:
+  - Pfade umgestellt auf `~/trading-app/backend/data/monitoring/` (+ env-Override `MONITORING_DIR` für Dev)
+  - Production-Center-Unterverzeichnis unter dem gleichen Pfad (zuvor `~/agent-templates/monitoring/production-center/`)
+  - SSH-pull für `health_check.json` von VM 100 unverändert
+- **`agent-templates/monitoring/monitoring_crew.py`** (commit `18fea7f`): disk_usage war leer, weil `get_real_storage_usage()` dict zurückgab, Parser aber `isinstance(..., string)` prüfte → jetzt dict.values() Iteration. Mission Control JSON disk_usage wieder korrekt befüllt.
+- **`agent-templates/monitoring/collect_status.py`** (commit `d029400`): LXC 104 prüft `trading-backend` nicht mehr per `systemctl is-active` (system-scope) sondern per TCP-port-check `/api/health` — user-scope-services sind per system-systemctl nicht sichtbar.
+- **`missioncontrol-app/update.sh`**: Default `API_URL` von `100.103.32.107:8000` → `100.112.199.58:8000` (LXC 104). NEU: `SERVER_SSH` angepasst.
+
+### Verifikation
+- Alle 8 Mission-Control-Endpoints liefern HTTP 200 mit echten Daten
+- Overview: status "ok", health_score 100, Health 100/good
+- System: 6 VMs, 13 Services, 5 Backups, last_report 2026-08-10
+- Production-Center: disk_usage gefüllt (local-lvm 26.5%, pbs-main 7.3% etc.)
+- App auf CachyBigOne: Daten laden ✓
+
+### Offen
+- Trading App Frontend `api_config.dart` war schon vor dieser Session korrekt auf LXC 104 (kein Rebuild nötig)
