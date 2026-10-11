@@ -78,24 +78,27 @@ DESKTOP
 
 # ── Backend ──────────────────────────────────────────────────────────────
 do_backend() {
-    echo -e "${BOLD}${YELLOW}═══ Backend Update (ai-agents via SSH) ═══${RESET}"
+    echo -e "${BOLD}${YELLOW}═══ Backend Update (VM 101 -> LXC 104 via rsync) ═══${RESET}"
 
-    if ! ssh -q "$SERVER_SSH" exit 2>/dev/null; then
-        echo "✗ Kein SSH-Zugang zu $SERVER_SSH – Update manuell auf dem Server ausführen:"
-        echo "  ssh ai-agents"
-        echo "  cd ~/trading-app && git pull && systemctl --user restart trading-backend"
+    if [ ! -d "$MISSION_DIR/backend/app" ]; then
+        echo "✗ Backend-Quellcode fehlt: $MISSION_DIR/backend/app"
         return 1
     fi
 
-    ssh "$SERVER_SSH" "
-        cd $TRADING_DIR && git pull && backend/.venv/bin/pip install networkx matplotlib -q --break-system-packages && systemctl --user restart trading-backend
-    "
-    sleep 2
+    # Deploy-Skript liegt im Repo und nutzt den lxc104_monitor-Key auf VM 101.
+    # Von anderen Rechnern: erst git pull auf VM 101, dann dort ausführen.
+    if [ -f "$HOME/.ssh/lxc104_monitor" ]; then
+        bash "$MISSION_DIR/backend/deploy.sh"
+    else
+        echo "⚠ Kein lxc104_monitor-Key vorhanden – Backend-Deploy auf VM 101 ausführen:"
+        echo "  ssh ai-agents 'cd ~/missioncontrol-app && git pull && bash backend/deploy.sh'"
+        return 1
+    fi
 
-    if ssh "$SERVER_SSH" "curl -sf $API_URL/api/health" > /dev/null 2>&1; then
+    if curl -sf --max-time 15 "$API_URL/api/health" > /dev/null 2>&1; then
         echo -e "${GREEN}✓ Backend OK${RESET}"
     else
-        echo -e "${YELLOW}⚠ Backend antwortet nicht – prüfen mit: ssh ai-agents systemctl --user status trading-backend${RESET}"
+        echo -e "${YELLOW}⚠ Backend antwortet nicht – prüfen: ssh ai-agents (LXC 104 trading-backend.service)${RESET}"
     fi
 }
 
