@@ -1,0 +1,458 @@
+{
+  ".githooks/post-commit": {
+    "mtime": 1780186312.160303,
+    "seen": 1791747866.0743647,
+    "ast_hash": "ad630649fa4182598bf22e6d6da66617",
+    "semantic_hash": ""
+  },
+  ".githooks/pre-commit": {
+    "mtime": 1780186312.160303,
+    "seen": 1791747866.074371,
+    "ast_hash": "af868f9d3e9b7037e1b2ebc37ccb7002",
+    "semantic_hash": ""
+  },
+  "backend/app/__init__.py": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.0743735,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "backend/app/config.py": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.0743752,
+    "ast_hash": "835a3bd85a49b52864f70f807e7eb0de",
+    "semantic_hash": ""
+  },
+  "backend/app/main.py": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.0743763,
+    "ast_hash": "28bd0d446b6c237ba094544b2067dc38",
+    "semantic_hash": ""
+  },
+  "backend/app/routers/__init__.py": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.0743778,
+    "ast_hash": "128ad986e7495ffb83e9ea79caccb261",
+    "semantic_hash": ""
+  },
+  "backend/app/routers/missioncontrol.py": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.074379,
+    "ast_hash": "56c47c0b2ff237979cfbc6532e5ea8e0",
+    "semantic_hash": ""
+  },
+  "backend/app/schemas.py": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.0743797,
+    "ast_hash": "5a15b0b29b3d6c754994763b410c5753",
+    "semantic_hash": ""
+  },
+  "backend/app/services/__init__.py": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.0743809,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "backend/deploy.sh": {
+    "mtime": 1791747447.0276322,
+    "seen": 1791747866.0743818,
+    "ast_hash": "935efe3c154760dbec1aafbea311f174",
+    "semantic_hash": ""
+  },
+  "backend/health_checker.py": {
+    "mtime": 1779865229.5102997,
+    "seen": 1791747866.0743825,
+    "ast_hash": "ab3861cca7e2d691a08e2d62a6accf7e",
+    "semantic_hash": ""
+  },
+  "backend/pyproject.toml": {
+    "mtime": 1791747406.3744314,
+    "seen": 1791747866.0743835,
+    "ast_hash": "c8871fb6efdfb3fe59b5824f6d669e76",
+    "semantic_hash": ""
+  },
+  "frontend/android/app/build.gradle.kts": {
+    "mtime": 1779866599.1884403,
+    "seen": 1791747866.0743845,
+    "ast_hash": "4f96988e70fd479a0643613f8dcd5569",
+    "semantic_hash": ""
+  },
+  "frontend/android/app/src/main/kotlin/com/missioncontrol/missioncontrol_app/MainActivity.kt": {
+    "mtime": 1779864965.913666,
+    "seen": 1791747866.0743852,
+    "ast_hash": "0a3ded939cc6b9271e274812b379977c",
+    "semantic_hash": ""
+  },
+  "frontend/android/build.gradle.kts": {
+    "mtime": 1779864965.917666,
+    "seen": 1791747866.074386,
+    "ast_hash": "f11f360aed44d4f6871b398346af14f0",
+    "semantic_hash": ""
+  },
+  "frontend/android/settings.gradle.kts": {
+    "mtime": 1779864965.9256659,
+    "seen": 1791747866.0743868,
+    "ast_hash": "4440672748462857e9bdbbf5fd06fe1a",
+    "semantic_hash": ""
+  },
+  "frontend/lib/app.dart": {
+    "mtime": 1780701537.0348172,
+    "seen": 1791747866.0743878,
+    "ast_hash": "ddf5c02459a62c93605bf1cf8c11da91",
+    "semantic_hash": ""
+  },
+  "frontend/lib/config/api_config.dart": {
+    "mtime": 1781006650.091955,
+    "seen": 1791747866.0743885,
+    "ast_hash": "ebb37ca5ce68c99f196e3e0d2deaabd5",
+    "semantic_hash": ""
+  },
+  "frontend/lib/config/theme.dart": {
+    "mtime": 1781018288.3505085,
+    "seen": 1791747866.0743892,
+    "ast_hash": "77e0a91000b49928561c21717186ed6b",
+    "semantic_hash": ""
+  },
+  "frontend/lib/main.dart": {
+    "mtime": 1780186312.160303,
+    "seen": 1791747866.0743897,
+    "ast_hash": "55071248733d024bd7c9512d8dcf7b61",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_code_quality.dart": {
+    "mtime": 1780701544.4868577,
+    "seen": 1791747866.0743904,
+    "ast_hash": "081b893a17bc4f3806b28ce69f84be6e",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_graphiphy.dart": {
+    "mtime": 1780701545.9748657,
+    "seen": 1791747866.0743914,
+    "ast_hash": "f807cd08fd5391a5d3a1509296b68872",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_health.dart": {
+    "mtime": 1779865034.4138286,
+    "seen": 1791747866.0743926,
+    "ast_hash": "41e8e8681e710ea735b6e1587ecfdfef",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_live.dart": {
+    "mtime": 1779896634.0379841,
+    "seen": 1791747866.0743933,
+    "ast_hash": "3914c878ac3be49ba19dc62988f209d7",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_overview.dart": {
+    "mtime": 1780702230.813885,
+    "seen": 1791747866.0743945,
+    "ast_hash": "33346563c20f7f482ef4c38ecc474f13",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_reports.dart": {
+    "mtime": 1780702237.241909,
+    "seen": 1791747866.0743952,
+    "ast_hash": "45a077c716f1d911ceb8efba90d7a484",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_service_history.dart": {
+    "mtime": 1781006644.719936,
+    "seen": 1791747866.074396,
+    "ast_hash": "05328d57825b53f58eb54c3b19186bde",
+    "semantic_hash": ""
+  },
+  "frontend/lib/models/missioncontrol_system.dart": {
+    "mtime": 1780702233.277894,
+    "seen": 1791747866.0743966,
+    "ast_hash": "e90eab4741645ed3360b7b466f045d30",
+    "semantic_hash": ""
+  },
+  "frontend/lib/pages/code_quality_page.dart": {
+    "mtime": 1781995758.9008737,
+    "seen": 1791747866.0743973,
+    "ast_hash": "ad2171087e4be30198a43625eaf44129",
+    "semantic_hash": ""
+  },
+  "frontend/lib/pages/graphiphy_page.dart": {
+    "mtime": 1780702243.0339308,
+    "seen": 1791747866.0743983,
+    "ast_hash": "13523a407cf5ebf01d65b40c0867bc92",
+    "semantic_hash": ""
+  },
+  "frontend/lib/pages/live_page.dart": {
+    "mtime": 1783079630.8643064,
+    "seen": 1791747866.074399,
+    "ast_hash": "69303acacf9808c09d0ba4200e713bd8",
+    "semantic_hash": ""
+  },
+  "frontend/lib/pages/overview_page.dart": {
+    "mtime": 1781018371.3664856,
+    "seen": 1791747866.0743997,
+    "ast_hash": "05eecd75979c333214e6a82995297f60",
+    "semantic_hash": ""
+  },
+  "frontend/lib/pages/reports_page.dart": {
+    "mtime": 1780702241.0379233,
+    "seen": 1791747866.0744011,
+    "ast_hash": "311d1f7ef9abc38a0d90c3453f343b51",
+    "semantic_hash": ""
+  },
+  "frontend/lib/pages/system_page.dart": {
+    "mtime": 1780050187.2849483,
+    "seen": 1791747866.0744019,
+    "ast_hash": "9c48e14981f9e5c98d2321c19c9fb495",
+    "semantic_hash": ""
+  },
+  "frontend/lib/providers/graphiphy_provider.dart": {
+    "mtime": 1779894228.0804746,
+    "seen": 1791747866.0744026,
+    "ast_hash": "a156a0437a01321eb30b967142250677",
+    "semantic_hash": ""
+  },
+  "frontend/lib/providers/live_provider.dart": {
+    "mtime": 1781006661.5159957,
+    "seen": 1791747866.0744033,
+    "ast_hash": "07e040dfed330af35cc4e269b932898f",
+    "semantic_hash": ""
+  },
+  "frontend/lib/providers/missioncontrol_provider.dart": {
+    "mtime": 1780701538.0828228,
+    "seen": 1791747866.074404,
+    "ast_hash": "14fe5e70b23f2f33f5674b64fc60800e",
+    "semantic_hash": ""
+  },
+  "frontend/lib/providers/reports_provider.dart": {
+    "mtime": 1779891927.481406,
+    "seen": 1791747866.074405,
+    "ast_hash": "f088e252c5b2b9faf94568032d4226a0",
+    "semantic_hash": ""
+  },
+  "frontend/lib/services/notification_service.dart": {
+    "mtime": 1780186312.160303,
+    "seen": 1791747866.0744057,
+    "ast_hash": "43603a978c3331824cfaf6425d3c23d1",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/disk_bar.dart": {
+    "mtime": 1779865063.6218984,
+    "seen": 1791747866.0744064,
+    "ast_hash": "e1f277a6f0589829fa55dfc7e32c1d78",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/finding_card.dart": {
+    "mtime": 1779865080.7619395,
+    "seen": 1791747866.074407,
+    "ast_hash": "3bf878d5a8de1fbd57a96b6d2f58fe9c",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/health_dot.dart": {
+    "mtime": 1779865059.1618876,
+    "seen": 1791747866.074408,
+    "ast_hash": "58ffe5a8dd395f38d6b63c9d5072bbe6",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/health_score_card.dart": {
+    "mtime": 1779865218.4822726,
+    "seen": 1791747866.0744088,
+    "ast_hash": "146cc5557539e2f544692b4b686f1ad0",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/refresh_badge.dart": {
+    "mtime": 1780702239.7219183,
+    "seen": 1791747866.0744126,
+    "ast_hash": "5c53f71aabc72aab83ba14583bf9c63d",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/service_history_chart.dart": {
+    "mtime": 1781018309.5464983,
+    "seen": 1791747866.0744133,
+    "ast_hash": "2937e6d68fc7842596c81d6266a946c3",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/service_matrix.dart": {
+    "mtime": 1779959864.6847699,
+    "seen": 1791747866.074414,
+    "ast_hash": "1693d2b2a24a6d3c6425f4614b219e89",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/vm_detail_card.dart": {
+    "mtime": 1779879791.833456,
+    "seen": 1791747866.0744147,
+    "ast_hash": "a75f83154b0441aaa683bf550b911c5a",
+    "semantic_hash": ""
+  },
+  "frontend/lib/widgets/vm_ring_card.dart": {
+    "mtime": 1779880164.7513673,
+    "seen": 1791747866.0744154,
+    "ast_hash": "d1202c2794a2f1e62eacefc4d5c41d3b",
+    "semantic_hash": ""
+  },
+  "frontend/linux/flutter/generated_plugin_registrant.cc": {
+    "mtime": 1779884573.7525618,
+    "seen": 1791747866.0744162,
+    "ast_hash": "bd6e64368e100cca8e55173215ae1bdd",
+    "semantic_hash": ""
+  },
+  "frontend/linux/flutter/generated_plugin_registrant.h": {
+    "mtime": 1779864966.785668,
+    "seen": 1791747866.0744169,
+    "ast_hash": "d295462c9da9f7fef22dc86c34492318",
+    "semantic_hash": ""
+  },
+  "frontend/linux/runner/main.cc": {
+    "mtime": 1779864965.881666,
+    "seen": 1791747866.0744176,
+    "ast_hash": "0643b8609698e96b3abd63c210361a87",
+    "semantic_hash": ""
+  },
+  "frontend/linux/runner/my_application.cc": {
+    "mtime": 1779864965.901666,
+    "seen": 1791747866.0744185,
+    "ast_hash": "fd9641512b6df108facd3ef6312144f1",
+    "semantic_hash": ""
+  },
+  "frontend/linux/runner/my_application.h": {
+    "mtime": 1779864965.881666,
+    "seen": 1791747866.074419,
+    "ast_hash": "326a85d68857137fdfe8698a0c071baf",
+    "semantic_hash": ""
+  },
+  "frontend/test/widget_test.dart": {
+    "mtime": 1779865182.2661846,
+    "seen": 1791747866.0744197,
+    "ast_hash": "67857913efb1f67b1fa7085e09f39c7a",
+    "semantic_hash": ""
+  },
+  "schema.json": {
+    "mtime": 1779995147.1760411,
+    "seen": 1791747866.0744205,
+    "ast_hash": "dbf9afce3ac3785fd004b0d9f50004f7",
+    "semantic_hash": ""
+  },
+  "update.sh": {
+    "mtime": 1791747460.4560244,
+    "seen": 1791747866.0744214,
+    "ast_hash": "1dceb9c3a9627994452885d3698ad839",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1786372361.1819606,
+    "seen": 1791747866.0744224,
+    "ast_hash": "a8022f258c6063ced590f1a70b293257",
+    "semantic_hash": ""
+  },
+  "deploy/app.missioncontrol.MissionControlApp.yml": {
+    "mtime": 1779900900.6708891,
+    "seen": 1791747866.0744233,
+    "ast_hash": "240aae6e9991e4d09a6a6f7c082c24bb",
+    "semantic_hash": ""
+  },
+  "frontend/README.md": {
+    "mtime": 1779864965.9056659,
+    "seen": 1791747866.074424,
+    "ast_hash": "743f10ae56b940cee62213b5fd631344",
+    "semantic_hash": ""
+  },
+  "frontend/analysis_options.yaml": {
+    "mtime": 1779864965.933666,
+    "seen": 1791747866.074425,
+    "ast_hash": "66d03d7647c8e438164feaf5b922d44a",
+    "semantic_hash": ""
+  },
+  "frontend/linux/CMakeLists.txt": {
+    "mtime": 1779864965.9056659,
+    "seen": 1791747866.074426,
+    "ast_hash": "6a61556b690b5f11a46b8c5cc23dbcbd",
+    "semantic_hash": ""
+  },
+  "frontend/linux/flutter/CMakeLists.txt": {
+    "mtime": 1779864965.9056659,
+    "seen": 1791747866.0744267,
+    "ast_hash": "46690fb8ffaf7d227d8bc4713f31140d",
+    "semantic_hash": ""
+  },
+  "frontend/linux/runner/CMakeLists.txt": {
+    "mtime": 1779864965.881666,
+    "seen": 1791747866.0744271,
+    "ast_hash": "6d75431dc21756981b53a7494c836311",
+    "semantic_hash": ""
+  },
+  "frontend/pubspec.yaml": {
+    "mtime": 1779897186.0131736,
+    "seen": 1791747866.074428,
+    "ast_hash": "784272ed8b2ee4f35ceb0cb5bb8aae6b",
+    "semantic_hash": ""
+  },
+  "backend/static/avatars/buffett.png": {
+    "mtime": 1791747406.3744314,
+    "seen": 1791747866.074429,
+    "ast_hash": "2824a61b9ba266501b6a444f2cd10101",
+    "semantic_hash": ""
+  },
+  "backend/static/avatars/lynch.png": {
+    "mtime": 1791747406.3744314,
+    "seen": 1791747866.0744298,
+    "ast_hash": "23449d76d220a30639b9184fcffe2f1d",
+    "semantic_hash": ""
+  },
+  "backend/static/avatars/planb.png": {
+    "mtime": 1791747406.3704312,
+    "seen": 1791747866.0744305,
+    "ast_hash": "90659edafbd3a6f8000c3edde9c468de",
+    "semantic_hash": ""
+  },
+  "backend/static/avatars/saylor.png": {
+    "mtime": 1791747406.3744314,
+    "seen": 1791747866.0744312,
+    "ast_hash": "feeab7974d9bfbd121044fa99ef1ce65",
+    "semantic_hash": ""
+  },
+  "backend/static/avatars/soros.png": {
+    "mtime": 1791747406.3744314,
+    "seen": 1791747866.0744326,
+    "ast_hash": "7bbac0b58d8b7d24689bf8f162819c00",
+    "semantic_hash": ""
+  },
+  "backend/static/avatars/wood.png": {
+    "mtime": 1791747406.3744314,
+    "seen": 1791747866.0744333,
+    "ast_hash": "5ded400b09e605a233d177bb1b9989e5",
+    "semantic_hash": ""
+  },
+  "deploy/icon.png": {
+    "mtime": 1779900891.4986384,
+    "seen": 1791747866.0744343,
+    "ast_hash": "ac5377c22c673ce71930eb2692d33ed4",
+    "semantic_hash": ""
+  },
+  "frontend/android/app/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1779864965.921666,
+    "seen": 1791747866.074435,
+    "ast_hash": "13e9c72ec37fac220397aa819fa1ef2d",
+    "semantic_hash": ""
+  },
+  "frontend/android/app/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1779864965.921666,
+    "seen": 1791747866.074436,
+    "ast_hash": "6270344430679711b81476e29878caa7",
+    "semantic_hash": ""
+  },
+  "frontend/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1779864965.921666,
+    "seen": 1791747866.0744367,
+    "ast_hash": "a0a8db5985280b3679d99a820ae2db79",
+    "semantic_hash": ""
+  },
+  "frontend/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1779864965.9256659,
+    "seen": 1791747866.0744374,
+    "ast_hash": "afe1b655b9f32da22f9a4301bb8e6ba8",
+    "semantic_hash": ""
+  },
+  "frontend/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1779864965.921666,
+    "seen": 1791747866.074438,
+    "ast_hash": "57838d52c318faff743130c3fcfae0c6",
+    "semantic_hash": ""
+  }
+}
