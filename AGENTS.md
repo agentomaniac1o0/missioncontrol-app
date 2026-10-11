@@ -6,14 +6,14 @@ Cross-Platform Mission Control App (FastAPI + Flutter) für Home Lab (pve-1) und
 Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine native Flutter-App mit Push-Benachrichtigungen.
 
 **Repo:** `~/missioncontrol-app/` (öffentlich auf GitHub)
-**Backend:** Bestehender FastAPI-Backend in `~/trading-app/backend/` wird erweitert
+**Backend:** Eigenständiger FastAPI-Backend in `~/missioncontrol-app/backend/` (seit 2026-10-11, davor trading-app)
 
 ## Code Conventions
 
 | Sprach | Skill | Wann laden |
 |--------|-------|------------|
 | Dart (Frontend) | `/flutter-conventions` | Riverpod, Widgets, State Management |
-| Python (Backend-Erw.) | `/python-conventions` | FastAPI-Router im trading-app Backend |
+| Python (Backend) | `/python-conventions` | FastAPI-Router im eigenen MC-Backend |
 | Beide | `/code-quality` | Nach jeder Code-Generierung |
 | Tests | `/testing-conventions` | flutter_test, pytest |
 
@@ -30,7 +30,7 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 └────────────────────────┬────────────────────────────┘
                          │ HTTP/JSON
 ┌────────────────────────▼────────────────────────────┐
-│  FastAPI Backend (trading-app/backend)                │
+│  FastAPI Backend (missioncontrol-app/backend)         │
 │  Neue Router: /api/missioncontrol/                    │
 │  Health-Check Hintergrund-Task (stündlich)            │
 │  Health Score Berechnung                              │
@@ -52,7 +52,7 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 
 | # | Entscheidung | Gewählt |
 |---|-------------|---------|
-| 1 | API-Ansatz | Bestehender FastAPI-Backend (trading-app) erweitert |
+| 1 | API-Ansatz | Eigenständiger FastAPI-Backend (missioncontrol-app/backend) |
 | 2 | Production-Center-Daten holen | Backend pullt per SSH von der Schaltzentrale |
 | 3 | Monitoring-Umfang production-center | Gleicher Umfang wie Home Lab (eigene Crew existiert) |
 | 4 | Datenformat | Strukturiertes JSON |
@@ -70,7 +70,7 @@ Ersetzt Discord-Berichte und das Streamlit Mission Control Dashboard durch eine 
 | 16 | Discord | Wird später stillgelegt, Push + Nextcloud als Ersatzkanäle |
 | 17 | Nextcloud | Crew schreibt automatisch per WebDAV, App liest nur via API |
 
-## Backend-Endpoints (zu implementieren in trading-app/backend)
+## Backend-Endpoints (implementiert in missioncontrol-app/backend)
 
 | Endpoint | Beschreibung | Quelle |
 |----------|-------------|--------|
@@ -183,7 +183,7 @@ RPi Watchdog → externe Ping-Daten per SSH-Pull
 | HTTP | Dio 5.0+ |
 | Charts | fl_chart 0.69+ |
 | Push | flutter_local_notifications + workmanager |
-| Backend | FastAPI 0.115+ (in trading-app/backend) |
+| Backend | FastAPI 0.115+ (missioncontrol-app/backend) |
 | Health Checks | asyncio Background Tasks |
 | SSH-Pull | asyncssh / paramiko |
 
@@ -249,7 +249,7 @@ missioncontrol-app/
 - [ ] Altes mission-control Streamlit-Dashboard archiviert
 - [ ] JSON-Schema für Monitoring-Reports definieren
 - [ ] Monitoring Crews: JSON-Output parallel zu Markdown (Home Lab)
-- [ ] Backend: Neue Router `/api/missioncontrol/` in trading-app/backend
+- [x] Backend: Router `/api/missioncontrol/` (missioncontrol-app/backend, eigenständig seit 2026-10-11)
 - [ ] Backend: Health-Check Background-Task
 - [ ] Backend: Health Score Berechnung
 - [ ] Backend: Production Center Platzhalter-Endpoints
@@ -287,19 +287,16 @@ Das macht: `git pull` → `flutter build linux` → `flatpak-builder install`
 
 APK liegt in Nextcloud: `Home Lab/Mission Control/missioncontrol-*.apk`
 
-### Backend (Server: LXC 104 trading-app)
+### Backend (Server: LXC 104)
 
-Das Backend läuft auf **LXC 104** (Tailscale `100.112.199.58:8000`) — nicht mehr auf VM 101. Update via:
+Das Backend läuft auf **LXC 104** (Tailscale `100.112.199.58:8000`). Deploy von VM 101:
 
 ```bash
-# Update auf VM 101 pullen,
-ssh ai-agents
-cd ~/trading-app && git pull
-# Auf LXC 104 deployen via LXC 104 root SSH:
-scp -i ~/.ssh/lxc104_monitor backend/app/routers/missioncontrol.py root@100.112.199.58:/home/trading/trading-app/backend/app/routers/
-# Service kicker:
-ssh -i ~/.ssh/lxc104_monitor root@100.112.199.58 "chown trading:trading /home/trading/trading-app/backend/app/routers/missioncontrol.py; su - trading -c 'export XDG_RUNTIME_DIR=/run/user/1000; export DBUS_SESSION_BUS_ADDRESS=unix:path=\$XDG_RUNTIME_DIR/bus; systemctl --user restart trading-backend.service'"
+bash ~/missioncontrol-app/backend/deploy.sh
+# rsync app/ static/ pyproject.toml -> LXC 104, chown trading, restart, health check
 ```
+
+update.sh `--backend` ruft deploy.sh auf (nutzt `~/.ssh/lxc104_monitor`, nur auf VM 101 vorhanden).
 
 ## Session-Log: 2026-05-27
 
@@ -355,7 +352,7 @@ ssh -i ~/.ssh/lxc104_monitor root@100.112.199.58 "chown trading:trading /home/tr
 - Refresh-Badges: Täglich (gold), Stündlich (blau), Live (grün)
 - Linux Release + Flatpak + Android APK Build
 
-### Backend (trading-app)
+### Backend (historisch: trading-app — am 2026-10-11 übernommen)
 - Router `/api/missioncontrol/` mit 5 Endpoints
 - Markdown-Parser: VM/LXC/Service/Backup-Daten aus Crew-Report extrahiert
 - Health Score (0-100) mit Sub-Scores (VMs, Services, Audit)
@@ -379,7 +376,7 @@ ssh -i ~/.ssh/lxc104_monitor root@100.112.199.58 "chown trading:trading /home/tr
 
 - Streamlit Mission Control → archiviert in `~/mission-control_old/` (wird nach Migration gelöscht)
 - Discord-Berichte → werden später stillgelegt
-- Trading-Analysen → bleiben in `~/trading-app/`
+- Trading → 2026-10-11 stillgelegt (GitHub-Archive: agentomaniac1o0/trading-crew, trading-app, crypto-arb)
 - API-Kosten/Token-Tracking → nicht lokal trackbar (OpenCode Go)
 - CronMaster → bleibt auf LXC 102
 
@@ -393,9 +390,9 @@ ssh -i ~/.ssh/lxc104_monitor root@100.112.199.58 "chown trading:trading /home/tr
 - **Health-Check:** `update.sh:85` → `ssh $SERVER_SSH "curl -sf $API_URL/api/health"`
 - **SSH-Ziel:** `100.103.32.107` (ai-agents VM 101)
 
-### Abhängigkeiten zum trading-app Backend
-- Mission Control App hat **kein eigenes Backend** — alle API-Calls gehen an `trading-app/backend`
-- Neue Router (`/api/missioncontrol/`) sind im trading-app-Backend integriert
+### Backend-Eigenständigkeit (seit 2026-10-11)
+- Mission Control App hat **eigenes Backend** (`backend/` in diesem Repo) — alle API-Calls gehen dorthin
+- Trading-Router/DB-Layer wurden bei der Stilllegung entfernt; nur missioncontrol + /health bleibt
 - Portfolio-Review, Production-Center, Health-Checks — alles über den gleichen Port 8000
 - **Kritisch:** Wenn der Backend nicht erreichbar ist (falscher Bind, Port-Problem), ist die gesamte App funktionslos
 
@@ -424,3 +421,12 @@ ssh -i ~/.ssh/lxc104_monitor root@100.112.199.58 "chown trading:trading /home/tr
 
 ### Offen
 - Trading App Frontend `api_config.dart` war schon vor dieser Session korrekt auf LXC 104 (kein Rebuild nötig)
+
+## Session-Log: 2026-10-11 — Trading-Stilllegung: Backend eigenständig
+
+- **Backend-Quellcode übernommen:** `backend/` (app/main.py, config, schemas, routers/missioncontrol.py, static/, pyproject.toml) — Commit `2d59304`
+- **Trading-Anteile entfernt:** 7 Trading-Router, DB-Layer (database/models/crud/alembic), 16 Trading-Schemas, yfinance/ccxt/sqlalchemy-Dependencies
+- **Neu:** `backend/deploy.sh` (rsync VM 101 → LXC 104, chown, restart, health-check) — ersetzt alten git-pull-Deploy (trading-app-Repo ist GitHub-archiviert)
+- **update.sh --backend:** nutzt deploy.sh
+- **LXC 104 deployed:** Alle 21 MC-Endpunkte + health verifiziert 200; venv 275→228 MB; Altlasten ~1 GB gelöscht
+- **Bekannt:** Nach jedem Restart ist der erste `/graphiphy/png`-Call ein 500er (Cache-Race, pre-existing), danach 200
